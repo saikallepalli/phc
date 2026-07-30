@@ -1,0 +1,36 @@
+# Anything listed here is excluded from `COPY . /var/www/html/`,
+# which means it can never be served by Apache.
+
+.git
+.gitignore
+.dockerignore
+
+# Secrets — critical, these must never reach the webroot
+.env
+.env.*
+*.pem
+*.key
+
+# Build/CI files
+Dockerfile
+docker-compose.yml
+docker-compose.*.yml
+Jenkinsfile
+jenkins/
+
+# Editor / OS noise
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# Dependencies you'd rather install than copy (uncomment if you add composer)
+# vendor/
+# node_modules/
+
+# Local logs and dumps
+*.log
+*.sql
+*.sql.gz
+backups/

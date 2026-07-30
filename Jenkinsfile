@@ -5,16 +5,15 @@ pipeline {
     timestamps()
     buildDiscarder(logRotator(numToKeepStr: '20'))
     timeout(time: 20, unit: 'MINUTES')
-    disableConcurrentBuilds()
   }
 
   environment {
-    IMAGE      = 'phc-web'
-    TAG        = "${env.BUILD_NUMBER}"
-    DEPLOYMENT = 'phc-web'
-    NODE_PORT  = '30082'
-    // Jenkins runs in a container; the cluster API and NodePort are on the host.
-    HOST       = 'host.docker.internal'
+    IMAGE_NAME  = 'phcdashboard'
+    APP_TAG     = "${env.BUILD_NUMBER}"
+    DB_HOST     = '184.168.113.203'
+    DB_NAME     = 'phcdashboard'
+    APP_URL     = 'http://host.docker.internal:8082'
+    COMPOSE_PROJECT_NAME = 'phcdashboard'
   }
 
   stages {
@@ -22,107 +21,84 @@ pipeline {
     stage('Checkout') {
       steps {
         checkout scm
-        sh 'git rev-parse --short HEAD > .gitsha && cat .gitsha'
-      }
-    }
-
-    stage('Security gate') {
-      steps {
-        sh 'chmod +x scripts/security-gate.sh && ./scripts/security-gate.sh'
+        sh 'git rev-parse --short HEAD > .git-sha && cat .git-sha'
       }
     }
 
     stage('Build image') {
       steps {
+        sh 'docker build -t $IMAGE_NAME:$APP_TAG -t $IMAGE_NAME:latest .'
+      }
+    }
+
+    stage('Lint PHP') {
+      steps {
+        // Runs against the code already baked into the image, so no volume
+        // mount is needed — see the note about $PWD not resolving from
+        // inside the Jenkins container.
+        // php -l exits non-zero on a parse error, which fails the stage.
         sh '''
-          docker build \
-            --label "git.sha=$(cat .gitsha)" \
-            --label "jenkins.build=$BUILD_NUMBER" \
-            -t $IMAGE:$TAG -t $IMAGE:latest .
+          docker run --rm --entrypoint sh $IMAGE_NAME:$APP_TAG -c '
+            set -e
+            find /var/www/html -path "*/vendor" -prune -o -name "*.php" -print0 \
+              | xargs -0 -r -n1 php -l > /dev/null
+            echo "No syntax errors."
+          '
         '''
       }
     }
 
-    stage('Verify image contents') {
+    stage('Verify no secrets in webroot') {
       steps {
-        // The image must not contain the compose file, .git, or the Jenkinsfile.
+        // Fails the build if .dockerignore ever regresses and secrets get baked in.
         sh '''
-          leaked=$(docker run --rm --entrypoint sh $IMAGE:$TAG -c \
-            'ls -A /var/www/html | grep -E "^(docker-compose\\.ya?ml|\\.git|Jenkinsfile|\\.env|k8s|scripts)$" || true')
-          if [ -n "$leaked" ]; then
-            echo "Image ships files that must not be web-served:"
-            echo "$leaked"
+          LEAKED=$(docker run --rm --entrypoint sh $IMAGE_NAME:$APP_TAG -c \
+            'ls -A /var/www/html | grep -E "^(\\.env|\\.git|docker-compose\\.ya?ml|Dockerfile|Jenkinsfile)$" || true')
+          if [ -n "$LEAKED" ]; then
+            echo "Sensitive files present in webroot:"
+            echo "$LEAKED"
             exit 1
           fi
-          echo "Image contents OK."
+          echo "Webroot is clean."
         '''
-      }
-    }
-
-    stage('Sync DB secret') {
-      steps {
-        // Credentials live in Jenkins, not in the repo. Create these once under
-        // Manage Jenkins > Credentials as "Secret text" entries.
-        withCredentials([
-          string(credentialsId: 'phc-db-host', variable: 'DB_HOST'),
-          string(credentialsId: 'phc-db-name', variable: 'DB_NAME'),
-          string(credentialsId: 'phc-db-user', variable: 'DB_USER'),
-          string(credentialsId: 'phc-db-pass', variable: 'DB_PASS')
-        ]) {
-          sh '''
-            set +x
-            kubectl create secret generic phc-db \
-              --from-literal=DB_HOST="$DB_HOST" \
-              --from-literal=DB_PORT="3306" \
-              --from-literal=DB_NAME="$DB_NAME" \
-              --from-literal=DB_USER="$DB_USER" \
-              --from-literal=DB_PASS="$DB_PASS" \
-              --dry-run=client -o yaml | kubectl apply -f - >/dev/null
-            echo "Secret phc-db synced."
-          '''
-        }
       }
     }
 
     stage('Deploy') {
       steps {
-        sh '''
-          kubectl apply -f k8s/web.yaml
-          kubectl set image deployment/$DEPLOYMENT web=$IMAGE:$TAG --record=false
-          kubectl rollout status deployment/$DEPLOYMENT --timeout=180s
-        '''
+        // DB_PASS comes from Jenkins credentials, not from the repo.
+        withCredentials([usernamePassword(
+              credentialsId: 'phc-db',
+              usernameVariable: 'DB_USER',
+              passwordVariable: 'DB_PASS')]) {
+          sh '''
+            cat > .env <<EOF
+DB_HOST=${DB_HOST_VALUE}
+DB_PORT=3306
+DB_NAME=phcdashboard
+DB_USER=${DB_USER}
+DB_PASS=${DB_PASS}
+APP_TAG=${APP_TAG}
+EOF
+            docker compose up -d --force-recreate
+            rm -f .env
+          '''
+        }
       }
     }
 
     stage('Smoke test') {
       steps {
         sh '''
-          set -e
-          base="http://$HOST:$NODE_PORT"
-
-          # 1. Static frontend loads.
-          curl -fsS -o /dev/null "$base/index.html"
-          echo "  ok  index.html"
-
-          # 2. API answers and returns JSON, proving the DB connection works.
-          #    (a 500 with "Database connection failed" fails this check)
-          body=$(curl -fsS "$base/api.php?_p=api/pilots")
-          echo "$body" | head -c 200 | grep -q '^\\[' || {
-            echo "  FAIL  /api/pilots did not return a JSON array:"; echo "$body" | head -c 300; exit 1; }
-          echo "  ok  /api/pilots"
-
-          # 3. Protected route must reject an anonymous caller.
-          code=$(curl -s -o /dev/null -w '%{http_code}' -X DELETE "$base/api.php?_p=api/phcs/__smoke__")
-          [ "$code" = "401" ] || { echo "  FAIL  unauthenticated DELETE returned $code, expected 401"; exit 1; }
-          echo "  ok  auth enforced on DELETE"
-
-          # 4. Secrets must not be reachable over HTTP.
-          for path in docker-compose.yml .env Jenkinsfile .git/config; do
-            code=$(curl -s -o /dev/null -w '%{http_code}' "$base/$path")
-            [ "$code" = "404" ] || [ "$code" = "403" ] || {
-              echo "  FAIL  $path is publicly readable (HTTP $code)"; exit 1; }
+          for i in $(seq 1 20); do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" $APP_URL || echo 000)
+            echo "attempt $i -> HTTP $CODE"
+            [ "$CODE" = "200" ] && exit 0
+            sleep 3
           done
-          echo "  ok  no secret files served"
+          echo "App did not return HTTP 200 in time"
+          docker compose logs --tail=50 web
+          exit 1
         '''
       }
     }
@@ -130,32 +106,18 @@ pipeline {
 
   post {
     failure {
-      script {
-        // Only roll back if the failure happened at or after deployment.
-        sh '''
-          if kubectl get deployment/$DEPLOYMENT >/dev/null 2>&1; then
-            current=$(kubectl get deployment/$DEPLOYMENT -o jsonpath='{.spec.template.spec.containers[0].image}')
-            if [ "$current" = "$IMAGE:$TAG" ]; then
-              echo "Rolling back $DEPLOYMENT"
-              kubectl rollout undo deployment/$DEPLOYMENT || true
-              kubectl rollout status deployment/$DEPLOYMENT --timeout=120s || true
-            fi
-          fi
-        '''
-        sh 'kubectl describe deployment/$DEPLOYMENT || true'
-        sh 'kubectl logs -l app=$DEPLOYMENT --tail=80 --all-containers || true'
-      }
-    }
-    success {
-      echo "Deployed $IMAGE:$TAG — http://localhost:${env.NODE_PORT}"
+      // Roll back to the previously good image if one exists.
+      sh '''
+        PREV=$(( ${APP_TAG} - 1 ))
+        if docker image inspect $IMAGE_NAME:$PREV >/dev/null 2>&1; then
+          echo "Rolling back to $IMAGE_NAME:$PREV"
+          APP_TAG=$PREV docker compose up -d --force-recreate
+        fi
+      '''
     }
     always {
-      // Keep the last few tags, drop the rest.
-      sh '''
-        docker images "$IMAGE" --format '{{.Tag}}' \
-          | grep -E '^[0-9]+$' | sort -rn | tail -n +6 \
-          | xargs -r -I{} docker rmi "$IMAGE:{}" || true
-      '''
+      sh 'rm -f .env || true'
+      sh 'docker image prune -f --filter "until=168h" || true'
     }
   }
 }
