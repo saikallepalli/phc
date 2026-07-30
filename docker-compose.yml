@@ -1,0 +1,12 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8082:80"
+    environment:
+      DB_HOST: 184.168.113.203
+      DB_PORT: "3306"
+      DB_NAME: phcdashboard
+      DB_USER: phcdashboarduser
+      DB_PASS: drf@PHC26
+    restart: unless-stopped

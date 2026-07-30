@@ -1,0 +1,2410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PHC Upgradation Srikakulam Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<style>
+  :root {
+    --blue-50:#eef5ff;
+    --blue-100:#dbe8ff;
+    --blue-200:#bcd4ff;
+    --blue-300:#8eb6ff;
+    --blue-400:#5a8df0;
+    --blue-500:#2f6bdc;
+    --blue-600:#1f53b8;
+    --blue-700:#173f8c;
+    --blue-800:#102d66;
+    --blue-900:#0a1f47;
+    --ink-900:#0b1a33;
+    --ink-700:#324563;
+    --ink-500:#5a6c87;
+    --ink-300:#94a3b8;
+    --line:#e2e8f0;
+    --line-2:#eef2f7;
+    --bg:#f6f9ff;
+    --card:#ffffff;
+    --good:#16a34a;
+    --warn:#d97706;
+    --bad:#dc2626;
+    --shadow-sm:0 1px 2px rgba(15,38,79,.06);
+    --shadow:0 4px 16px rgba(15,38,79,.08);
+    --shadow-lg:0 12px 36px rgba(15,38,79,.14);
+    --radius:14px;
+    --radius-sm:10px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:var(--bg);
+    color:var(--ink-900);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.45;
+  }
+  a{color:var(--blue-600);text-decoration:none}
+  a:hover{text-decoration:underline}
+  button{font-family:inherit;cursor:pointer}
+  input,select,textarea{font-family:inherit;font-size:14px}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:6px}
+  ::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:linear-gradient(135deg,var(--blue-700),var(--blue-500));
+    color:#fff;
+    box-shadow:var(--shadow);
+  }
+  .topbar-inner{
+    max-width:1400px;margin:0 auto;
+    display:flex;align-items:center;gap:16px;
+    padding:12px 22px;
+  }
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand-logo{
+    width:42px;height:42px;border-radius:10px;
+    background:#fff;color:var(--blue-700);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:18px;
+    box-shadow:0 4px 12px rgba(0,0,0,.18);
+  }
+  .brand-text{display:flex;flex-direction:column;line-height:1.15}
+  .brand-text .t1{font-weight:700;font-size:15px;letter-spacing:.2px}
+  .brand-text .t2{font-size:11px;opacity:.85;text-transform:uppercase;letter-spacing:1.5px}
+  .nav{display:flex;align-items:center;gap:4px;margin-left:auto;flex-wrap:wrap}
+  .nav a{
+    color:#fff;padding:8px 14px;border-radius:8px;
+    font-size:14px;font-weight:500;opacity:.9;transition:all .2s;
+  }
+  .nav a:hover{background:rgba(255,255,255,.13);opacity:1;text-decoration:none}
+  .nav a.active{background:rgba(255,255,255,.2);opacity:1;font-weight:600}
+  .nav .btn-login{
+    background:#fff;color:var(--blue-700);
+    padding:8px 16px;font-weight:600;
+  }
+  .nav .btn-login:hover{background:var(--blue-50)}
+
+  /* ---------- Layout ---------- */
+  .page{max-width:1400px;margin:0 auto;padding:24px}
+  .page-head{
+    display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;
+    margin-bottom:22px;
+  }
+  .page-title{font-size:26px;font-weight:700;margin:0;color:var(--ink-900)}
+  .page-sub{color:var(--ink-500);margin:6px 0 0;font-size:14px}
+  .breadcrumb{font-size:13px;color:var(--ink-500);margin-bottom:6px}
+  .breadcrumb a{color:var(--blue-600)}
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    border:1px solid var(--line);background:#fff;color:var(--ink-900);
+    padding:9px 16px;border-radius:9px;font-size:13.5px;font-weight:500;
+    transition:all .15s;
+  }
+  .btn:hover{border-color:var(--blue-400);color:var(--blue-600);box-shadow:var(--shadow-sm)}
+  .btn-primary{
+    background:var(--blue-600);border-color:var(--blue-600);color:#fff;
+  }
+  .btn-primary:hover{background:var(--blue-700);border-color:var(--blue-700);color:#fff;box-shadow:var(--shadow)}
+  .btn-ghost{background:transparent;border-color:transparent;color:var(--blue-600)}
+  .btn-ghost:hover{background:var(--blue-50);border-color:transparent}
+  .btn-danger{background:#fff;color:var(--bad);border-color:#fecaca}
+  .btn-danger:hover{background:#fef2f2;color:var(--bad);border-color:#fca5a5}
+  .btn-sm{padding:6px 11px;font-size:12.5px}
+  .btn-icon{
+    width:34px;height:34px;padding:0;justify-content:center;
+  }
+
+  /* ---------- Cards ---------- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow-sm);
+  }
+  .card-pad{padding:20px}
+  .card-head{
+    padding:16px 20px;
+    border-bottom:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+  }
+  .card-head h3{margin:0;font-size:15px;font-weight:600;color:var(--ink-900)}
+  .card-body{padding:20px}
+
+  /* ---------- KPI tiles ---------- */
+  .kpi-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:14px;
+    margin-bottom:22px;
+  }
+  .kpi{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+    position:relative;overflow:hidden;
+    box-shadow:var(--shadow-sm);
+    transition:transform .15s,box-shadow .2s;
+  }
+  .kpi:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .kpi::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+    background:linear-gradient(180deg,var(--blue-400),var(--blue-700));
+  }
+  .kpi-label{font-size:11.5px;color:var(--ink-500);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+  .kpi-value{font-size:26px;font-weight:700;color:var(--ink-900);margin-top:6px;line-height:1.1}
+  .kpi-sub{font-size:12px;color:var(--ink-500);margin-top:4px}
+  .kpi-mini{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:12px;color:var(--ink-700)}
+  .pill{
+    display:inline-block;padding:2px 9px;border-radius:99px;
+    font-size:11px;font-weight:600;
+  }
+  .pill-good{background:#dcfce7;color:#166534}
+  .pill-warn{background:#fef3c7;color:#92400e}
+  .pill-bad{background:#fee2e2;color:#991b1b}
+  .pill-blue{background:var(--blue-100);color:var(--blue-800)}
+
+  /* ---------- Charts ---------- */
+  .chart-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(440px,1fr));
+    gap:16px;
+  }
+  .chart-card{height:100%}
+  .chart-wrap{position:relative;height:300px;padding:8px}
+
+  /* ---------- Forms ---------- */
+  .form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:14px}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field label{font-size:12.5px;font-weight:600;color:var(--ink-700)}
+  .field input,.field select,.field textarea{
+    padding:9px 12px;border:1px solid var(--line);border-radius:8px;
+    background:#fff;color:var(--ink-900);outline:none;transition:border-color .15s,box-shadow .15s;
+  }
+  .field input:focus,.field select:focus,.field textarea:focus{
+    border-color:var(--blue-400);box-shadow:0 0 0 3px rgba(47,107,220,.13);
+  }
+  .field input:disabled,.field select:disabled,.field textarea:disabled{
+    background:var(--line-2);color:var(--ink-300);cursor:not-allowed;border-color:var(--line);
+  }
+  .field.na-field{opacity:0.35;pointer-events:none}
+  .na-label{
+    display:inline-flex;align-items:center;gap:10px;
+    padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13.5px;color:var(--ink-700);
+    background:var(--blue-50);border:1px solid var(--blue-100);
+    transition:background .15s,border-color .15s;user-select:none;
+  }
+  .na-label:hover{background:var(--blue-100);border-color:var(--blue-200)}
+  .na-label input[type="checkbox"]{width:15px;height:15px;cursor:pointer;accent-color:var(--blue-600);flex-shrink:0}
+  .na-label.na-active{background:#fef9c3;border-color:#fde047;color:#713f12}
+  .na-row{margin-bottom:10px}
+  .field textarea{resize:vertical;min-height:80px}
+  .field-help{font-size:11.5px;color:var(--ink-500)}
+  .section-title{
+    font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue-700);
+    margin:18px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--blue-100);
+  }
+
+  /* ---------- Tables ---------- */
+  .table{width:100%;border-collapse:collapse;font-size:13.5px}
+  .table th{
+    text-align:left;padding:10px 14px;font-weight:600;color:var(--ink-500);
+    font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;
+    background:var(--blue-50);border-bottom:1px solid var(--line);
+  }
+  .table td{padding:12px 14px;border-bottom:1px solid var(--line-2);color:var(--ink-900)}
+  .table tr:hover td{background:#fafbff}
+
+  /* ---------- Login ---------- */
+  .login-wrap{
+    min-height:calc(100vh - 70px);
+    display:flex;align-items:center;justify-content:center;padding:24px;
+    background:
+      radial-gradient(at 10% 0%,var(--blue-100) 0,transparent 50%),
+      radial-gradient(at 90% 100%,#dde9ff 0,transparent 60%),
+      var(--bg);
+  }
+  .login-card{
+    width:100%;max-width:420px;
+    background:#fff;border-radius:18px;padding:34px;
+    box-shadow:var(--shadow-lg);border:1px solid var(--line);
+  }
+  .login-card h2{margin:0 0 6px;font-size:22px}
+  .login-card p{margin:0 0 22px;color:var(--ink-500);font-size:14px}
+  .login-card .field{margin-bottom:14px}
+  .login-card .btn-primary{width:100%;justify-content:center;padding:11px}
+  .login-hint{margin-top:14px;padding:10px 12px;background:var(--blue-50);border-radius:8px;font-size:12px;color:var(--blue-800)}
+
+  /* ---------- Hero (home) ---------- */
+  .hero{
+    background:linear-gradient(135deg,var(--blue-700) 0%,var(--blue-500) 100%);
+    color:#fff;border-radius:18px;padding:48px 44px;
+    margin-bottom:24px;position:relative;overflow:hidden;
+  }
+  .hero::after{
+    content:"";position:absolute;right:-100px;top:-100px;width:380px;height:380px;
+    background:radial-gradient(circle,rgba(255,255,255,.15),transparent 70%);
+  }
+  .hero h1{margin:0 0 10px;font-size:34px;font-weight:800;letter-spacing:-.5px;line-height:1.15}
+  .hero p{margin:0 0 18px;font-size:16px;opacity:.94;max-width:680px}
+  .hero-cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .hero-cta .btn{background:#fff;color:var(--blue-700);border-color:#fff}
+  .hero-cta .btn:hover{background:var(--blue-50)}
+  .hero-cta .btn-outline{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
+  .hero-cta .btn-outline:hover{background:rgba(255,255,255,.13);color:#fff}
+
+  /* ---------- PHC list ---------- */
+  .phc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+  .phc-card{
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px;box-shadow:var(--shadow-sm);transition:all .15s;
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .phc-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--blue-300)}
+  .phc-card h4{margin:0;font-size:15px;font-weight:600}
+  .phc-meta{font-size:12.5px;color:var(--ink-500)}
+  .phc-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+
+  /* ---------- Filter bar ---------- */
+  .filter-bar{
+    display:flex;gap:12px;flex-wrap:wrap;align-items:center;
+    padding:14px 18px;background:#fff;border:1px solid var(--line);
+    border-radius:var(--radius);margin-bottom:18px;box-shadow:var(--shadow-sm);
+  }
+  .filter-bar .field{flex-direction:row;align-items:center;gap:8px}
+  .filter-bar .field label{margin:0}
+  .filter-bar select,.filter-bar input{padding:7px 11px;font-size:13px}
+
+  /* ---------- Impact items ---------- */
+  .impact-tabs{
+    display:flex;gap:4px;margin-bottom:18px;flex-wrap:wrap;
+    background:#fff;padding:6px;border-radius:12px;border:1px solid var(--line);
+    box-shadow:var(--shadow-sm);
+  }
+  .impact-tab{
+    padding:9px 16px;border-radius:8px;font-size:13.5px;font-weight:500;
+    border:none;background:transparent;color:var(--ink-700);transition:all .15s;
+  }
+  .impact-tab:hover{background:var(--blue-50);color:var(--blue-700)}
+  .impact-tab.active{background:var(--blue-600);color:#fff}
+
+  .case-grid,.dignitary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+  .case-card{
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;
+  }
+
+  /* FIX: Case story image — larger, clickable */
+  .case-card-img{
+    width:100%;
+    height:320px;
+    object-fit:cover;
+    object-position:top center;
+    display:block;
+    flex-shrink:0;
+    cursor:pointer;
+    transition:transform .2s, opacity .15s;
+  }
+  .case-card-img:hover{ transform:scale(1.02); opacity:.93; }
+
+  .case-card-body{padding:16px 20px 20px;flex:1}
+  .case-card h4{margin:0 0 6px;font-size:16px;color:var(--blue-700)}
+  .case-card .case-meta{font-size:12px;color:var(--ink-500);margin-bottom:10px}
+  .case-card p{margin:0;font-size:14px;line-height:1.55;color:var(--ink-700);white-space:pre-wrap}
+
+  .video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px}
+  .video-card{
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;box-shadow:var(--shadow-sm);
+  }
+  .video-frame{aspect-ratio:16/9;background:#000;width:100%;display:block;border:0}
+  .video-info{padding:14px 16px}
+  .video-info h4{margin:0 0 4px;font-size:15px}
+  .video-info p{margin:0;font-size:13px;color:var(--ink-500)}
+
+  /* ---------- Picture grid ---------- */
+  .picture-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+  .picture-tile{
+    aspect-ratio:4/3;
+    background:#eef2f7;
+    border-radius:var(--radius-sm);
+    overflow:hidden;
+    position:relative;
+    border:1px solid var(--line);
+    cursor:pointer;
+    transition:transform .2s, box-shadow .2s;
+  }
+  .picture-tile:hover{ transform:translateY(-3px); box-shadow:var(--shadow); }
+  .picture-tile img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+  .picture-tile:hover img{ transform:scale(1.04); }
+  .picture-caption{
+    position:absolute;left:0;right:0;bottom:0;
+    background:linear-gradient(to top,rgba(0,0,0,.72),transparent);
+    color:#fff;padding:22px 12px 10px;font-size:12.5px;
+  }
+  /* skeleton shimmer for lazy-load */
+  .pic-skeleton{
+    width:100%;height:100%;
+    background:linear-gradient(90deg,#e8edf5 25%,#d0d8e8 50%,#e8edf5 75%);
+    background-size:400% 100%;
+    animation:shimmer 1.4s infinite;
+  }
+
+  .overall-impact{
+    background:linear-gradient(135deg,var(--blue-50),#fff);
+    border-left:4px solid var(--blue-500);
+    padding:24px;border-radius:var(--radius);
+    font-size:15px;line-height:1.7;color:var(--ink-700);white-space:pre-wrap;
+    border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+  }
+
+  /* ---------- Modal ---------- */
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(11,26,51,.55);
+    display:flex;align-items:center;justify-content:center;z-index:100;
+    padding:24px;backdrop-filter:blur(3px);
+  }
+  .modal{
+    background:#fff;border-radius:16px;width:100%;max-width:680px;
+    max-height:90vh;overflow:auto;box-shadow:var(--shadow-lg);
+  }
+  .modal-head{
+    padding:18px 24px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;
+    position:sticky;top:0;background:#fff;z-index:1;
+  }
+  .modal-head h3{margin:0;font-size:17px}
+  .modal-body{padding:24px}
+  .modal-foot{
+    padding:14px 24px;border-top:1px solid var(--line);
+    display:flex;justify-content:flex-end;gap:8px;
+    position:sticky;bottom:0;background:#fff;
+  }
+  .modal-close{
+    background:transparent;border:none;font-size:22px;color:var(--ink-500);
+    cursor:pointer;padding:0 6px;line-height:1;
+  }
+
+  /* ---------- LIGHTBOX ---------- */
+  .lightbox{
+    position:fixed;inset:0;z-index:500;
+    background:rgba(0,0,0,.92);
+    display:flex;align-items:center;justify-content:center;
+    flex-direction:column;
+    gap:14px;
+    padding:20px;
+    animation:lbIn .18s ease;
+  }
+  @keyframes lbIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+  .lightbox-img-wrap{
+    position:relative;
+    max-width:min(92vw, 1100px);
+    max-height:80vh;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .lightbox-img{
+    max-width:100%;
+    max-height:80vh;
+    width:auto;
+    height:auto;
+    object-fit:contain;
+    border-radius:10px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+    display:block;
+  }
+  .lightbox-close{
+    position:fixed;top:18px;right:22px;
+    background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.2);
+    color:#fff;border-radius:50%;width:40px;height:40px;
+    font-size:22px;line-height:1;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .15s;z-index:501;
+  }
+  .lightbox-close:hover{background:rgba(255,255,255,.25)}
+  .lightbox-caption{
+    color:rgba(255,255,255,.85);font-size:14px;
+    text-align:center;max-width:600px;
+    background:rgba(0,0,0,.4);padding:8px 18px;border-radius:8px;
+  }
+  .lightbox-nav{
+    position:fixed;top:50%;transform:translateY(-50%);
+    background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.2);
+    color:#fff;border-radius:50%;width:46px;height:46px;
+    font-size:22px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .15s;z-index:501;
+  }
+  .lightbox-nav:hover{background:rgba(255,255,255,.28)}
+  .lightbox-nav.prev{left:14px}
+  .lightbox-nav.next{right:14px}
+  .lightbox-counter{
+    position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+    color:rgba(255,255,255,.6);font-size:12.5px;
+    background:rgba(0,0,0,.4);padding:4px 14px;border-radius:20px;
+  }
+
+  /* ---------- Toast ---------- */
+  .toast{
+    position:fixed;bottom:22px;right:22px;z-index:200;
+    background:var(--ink-900);color:#fff;padding:12px 18px;border-radius:10px;
+    box-shadow:var(--shadow-lg);font-size:13.5px;
+    animation:slideUp .25s ease;
+  }
+  .toast.success{background:var(--good)}
+  .toast.error{background:var(--bad)}
+  @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+  @keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+
+  /* ---------- Empty state ---------- */
+  .empty{
+    text-align:center;padding:48px 24px;color:var(--ink-500);
+    background:#fff;border:2px dashed var(--line);border-radius:var(--radius);
+  }
+  .empty .em-icon{font-size:36px;margin-bottom:8px;opacity:.5}
+  .empty h4{margin:0 0 6px;color:var(--ink-700);font-size:16px}
+  .empty p{margin:0;font-size:13.5px}
+
+  /* ---------- Footer ---------- */
+  .footer{
+    text-align:center;padding:24px;color:var(--ink-500);font-size:12.5px;
+    border-top:1px solid var(--line);margin-top:40px;background:#fff;
+  }
+
+  /* ---------- Tabs ---------- */
+  .tabs{
+    display:flex;gap:2px;border-bottom:2px solid var(--line);margin-bottom:18px;
+    overflow-x:auto;
+  }
+  .tabs button{
+    background:transparent;border:none;padding:11px 18px;font-size:13.5px;font-weight:500;
+    color:var(--ink-500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;
+    white-space:nowrap;
+  }
+  .tabs button:hover{color:var(--blue-600)}
+  .tabs button.active{color:var(--blue-700);border-bottom-color:var(--blue-600);font-weight:600}
+
+  /* ---------- Misc ---------- */
+  .row-flex{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .grow{flex:1}
+  .muted{color:var(--ink-500)}
+  .center{text-align:center}
+  .right{text-align:right}
+  .mb-0{margin-bottom:0}
+  .mb-12{margin-bottom:12px}
+  .mb-20{margin-bottom:20px}
+  .mt-12{margin-top:12px}
+  .hidden{display:none !important}
+
+  /* ---------- Geo Map Modal ---------- */
+  .geo-overlay{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center}
+  .geo-box{background:#fff;border-radius:14px;width:92vw;max-width:1060px;height:84vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  .geo-head{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #e5e7eb;flex-shrink:0}
+  .geo-head h2{margin:0;font-size:18px;font-weight:700}
+  .geo-close-btn{border:none;background:none;font-size:28px;line-height:1;cursor:pointer;color:#6b7280;padding:0 4px}
+  .geo-close-btn:hover{color:#111}
+  #geoMapEl{flex:1;width:100%;position:relative}
+  .geo-foot{padding:8px 18px;font-size:12px;color:#6b7280;border-top:1px solid #f3f4f6;flex-shrink:0;min-height:30px;display:flex;align-items:center;gap:8px}
+  .geo-spinner{width:13px;height:13px;border:2px solid #e5e7eb;border-top-color:#1d4ed8;border-radius:50%;animation:geo-spin .7s linear infinite;flex-shrink:0}
+  @keyframes geo-spin{to{transform:rotate(360deg)}}
+  .geo-preloader{position:absolute;inset:0;background:#f8fafc;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  .geo-preloader-ring{width:46px;height:46px;border:4px solid #e5e7eb;border-top-color:#1d4ed8;border-radius:50%;animation:geo-spin .85s linear infinite}
+  .geo-preloader p{margin:0;color:#6b7280;font-size:13px;text-align:center}
+
+  @media (max-width:780px){
+    .hero{padding:32px 22px}
+    .hero h1{font-size:26px}
+    .topbar-inner{padding:10px 14px}
+    .nav{gap:0}
+    .nav a{padding:7px 10px;font-size:13px}
+    .page{padding:16px}
+    .chart-grid{grid-template-columns:1fr}
+    .chart-wrap{height:260px}
+    .case-card-img{height:240px}
+    .lightbox-nav{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="#home" class="brand" style="color:#fff;text-decoration:none">
+      <div class="brand-logo">PHC</div>
+      <div class="brand-text">
+        <span class="t1">PHC Upgradation Srikakulam</span>
+        <span class="t2">Performance Dashboard</span>
+      </div>
+    </a>
+    <nav class="nav" id="navMain">
+      <a href="#home" data-route="home">Home</a>
+      <a href="#dashboard" data-route="dashboard">Dashboard</a>
+      <a href="#impact" data-route="impact">Impact</a>
+      <a href="#reports" data-route="reports">Reports</a>
+      <a href="#login" data-route="login" id="navLogin" class="btn-login">Sign In</a>
+      <a href="#admin" data-route="admin" id="navAdmin" class="hidden">Admin</a>
+      <a href="#" id="navLogout" class="hidden">Logout</a>
+    </nav>
+  </div>
+</header>
+
+<main id="app"></main>
+
+<footer class="footer">
+  PHC Upgradation Srikakulam Dashboard
+</footer>
+
+<div id="toast"></div>
+<div id="modalRoot"></div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" class="lightbox hidden" role="dialog" aria-modal="true">
+  <button class="lightbox-close" id="lbClose" aria-label="Close">&times;</button>
+  <div class="lightbox-img-wrap">
+    <img id="lbImg" class="lightbox-img" src="" alt="" />
+  </div>
+  <div class="lightbox-caption" id="lbCaption"></div>
+  <button class="lightbox-nav prev" id="lbPrev">&#8249;</button>
+  <button class="lightbox-nav next" id="lbNext">&#8250;</button>
+  <div class="lightbox-counter" id="lbCounter"></div>
+</div>
+
+<div id="geoOverlay" class="geo-overlay hidden">
+  <div class="geo-box">
+    <div class="geo-head">
+      <h2>Geographical View — PHC Locations</h2>
+      <button id="geoCloseBtn" class="geo-close-btn">&times;</button>
+    </div>
+    <div id="geoMapEl">
+      <div id="geoPreloader" class="geo-preloader">
+        <div class="geo-preloader-ring"></div>
+        <p id="geoPreloaderMsg">Loading map…</p>
+      </div>
+    </div>
+    <div class="geo-foot" id="geoFoot"></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================================
+   PHC Upgradation Srikakulam Dashboard
+   ========================================================================= */
+
+/* ---------- LIGHTBOX ENGINE ---------- */
+let _lbItems = []; // [{src, caption}]
+let _lbIdx   = 0;
+
+function openLightbox(items, startIdx) {
+  _lbItems = items;
+  _lbIdx   = startIdx || 0;
+  showLbSlide();
+  document.getElementById('lightbox').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.add('hidden');
+  document.body.style.overflow = '';
+  _lbItems = [];
+}
+
+function showLbSlide() {
+  const item = _lbItems[_lbIdx];
+  if (!item) return;
+  const img = document.getElementById('lbImg');
+  img.src = item.src;
+  img.alt = item.caption || '';
+  document.getElementById('lbCaption').textContent = item.caption || '';
+  document.getElementById('lbCounter').textContent = `${_lbIdx + 1} / ${_lbItems.length}`;
+  document.getElementById('lbPrev').style.display = _lbItems.length > 1 ? '' : 'none';
+  document.getElementById('lbNext').style.display = _lbItems.length > 1 ? '' : 'none';
+}
+
+document.getElementById('lbClose').addEventListener('click', closeLightbox);
+document.getElementById('lightbox').addEventListener('click', e => { if (e.target === document.getElementById('lightbox')) closeLightbox(); });
+document.getElementById('lbPrev').addEventListener('click', () => { _lbIdx = (_lbIdx - 1 + _lbItems.length) % _lbItems.length; showLbSlide(); });
+document.getElementById('lbNext').addEventListener('click', () => { _lbIdx = (_lbIdx + 1) % _lbItems.length; showLbSlide(); });
+document.addEventListener('keydown', e => {
+  if (document.getElementById('lightbox').classList.contains('hidden')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') { _lbIdx = (_lbIdx - 1 + _lbItems.length) % _lbItems.length; showLbSlide(); }
+  if (e.key === 'ArrowRight') { _lbIdx = (_lbIdx + 1) % _lbItems.length; showLbSlide(); }
+});
+
+/* ---------- API helper ---------- */
+const _getCache = {};
+async function apiCall(method, path, body) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (_ADMIN_SESSION && _ADMIN_SESSION.token) {
+    headers['Authorization'] = 'Bearer ' + _ADMIN_SESSION.token;
+  }
+  if (method === 'GET' && _getCache[path]) return _getCache[path];
+  const opts = { method, headers };
+  if (body !== undefined) opts.body = JSON.stringify(body);
+  const url = '/api.php?_p=' + encodeURIComponent(path);
+  const res  = await fetch(url, opts);
+  let data;
+  try { data = await res.json(); } catch(e) { throw new Error('Invalid server response (JSON parse failed)'); }
+  if (!res.ok) throw new Error(data.error || 'HTTP ' + res.status);
+  if (method === 'GET') _getCache[path] = data;
+  return data;
+}
+
+/* ---------- Lazy picture loader ---------- */
+// Cache: phcId -> [{id, caption, data_url}]
+const _picCache = {};
+async function loadPictures(phcId) {
+  if (_picCache[phcId]) return _picCache[phcId];
+  const headers = { 'Content-Type': 'application/json' };
+  if (_ADMIN_SESSION?.token) headers['Authorization'] = 'Bearer ' + _ADMIN_SESSION.token;
+  try {
+    const res = await fetch('/api.php?p=/api/phcs/' + encodeURIComponent(phcId) + '/pictures', { headers });
+    const data = await res.json();
+    _picCache[phcId] = Array.isArray(data) ? data : [];
+  } catch(e) {
+    _picCache[phcId] = [];
+  }
+  return _picCache[phcId];
+}
+
+/* ---------- Indicator schema ---------- */
+const INDICATORS = [
+  { id:'opd',        label:'OPD Registrations',     unit:'count', fields:[{k:'value',l:'OPD Registrations'}] },
+  { id:'ipd',        label:'IPD Admissions',        unit:'count', fields:[{k:'value',l:'IPD Admissions'}] },
+  { id:'deliveries', label:'Institutional Deliveries', unit:'count', fields:[{k:'value',l:'Institutional Deliveries'}] },
+  { id:'labTests',   label:'Lab Tests',             unit:'count', fields:[{k:'value',l:'Lab Tests'}] },
+  { id:'oral',       label:'Oral Cancer Screening', unit:'cases', pilot:true,
+    fields:[{k:'screened',l:'Cases Screened'},{k:'positive',l:'Positive Cases'},{k:'referred',l:'Referred to Higher Facility'},{k:'treatmentInitiated',l:'Treatment Initiated'}] },
+  { id:'breast',     label:'Breast Cancer Screening', unit:'cases', pilot:true,
+    fields:[{k:'screened',l:'Cases Screened'},{k:'positive',l:'Positive Cases'},{k:'referred',l:'Referred to Higher Facility'},{k:'treatmentInitiated',l:'Treatment Initiated'}] },
+  { id:'cervical',   label:'Cervical Cancer Screening', unit:'cases', pilot:true,
+    fields:[{k:'screened',l:'Cases Screened'},{k:'positive',l:'Positive Cases'},{k:'referred',l:'Referred to Higher Facility'},{k:'treatmentInitiated',l:'Treatment Initiated'}] },
+  { id:'training',   label:'Staff Training Coverage', unit:'staff',
+    fields:[{k:'count',l:'No. of staff trained (BEmONC, IPC, BLS, General Emergencies, Comprehensive Cancer Care & Others combined)'}] },
+  { id:'drugIndent', label:'Essential Drug Indent Submission Status', unit:'status',
+    fields:[{k:'status',l:'Indent Submitted',type:'yesno'}] },
+  { id:'hr',         label:'HR Availability', unit:'posts',
+    fields:[
+      {k:'moSanc',l:'MO – Sanctioned'},{k:'moFilled',l:'MO – Filled'},
+      {k:'snSanc',l:'Staff Nurses – Sanctioned'},{k:'snFilled',l:'Staff Nurses – Filled'},
+      {k:'ltSanc',l:'Lab Technician – Sanctioned'},{k:'ltFilled',l:'Lab Technician – Filled'},
+      {k:'poSanc',l:'Pharmacy Officer – Sanctioned'},{k:'poFilled',l:'Pharmacy Officer – Filled'}
+    ] },
+  { id:'equipment',  label:'Equipment Downtime (days)', unit:'days',
+    fields:[
+      {k:'computers',l:'Computers'},{k:'deliveryBed',l:'Delivery Bed'},
+      {k:'lamp',l:'Ceiling Mounted Lamp'},{k:'paraMonitor',l:'Para Monitor'},
+      {k:'coag',l:'Coagulation Analyser'},{k:'doppler',l:'Foetal Doppler'}
+    ] },
+  { id:'bmw',        label:'BMW Compliance Status (Biomedical Waste Segregation Functional)', unit:'status',
+    fields:[{k:'status',l:'Functional Status',type:'yesno'}] }
+];
+
+/* ---------- Session (in-memory) ---------- */
+let _ADMIN_SESSION = null;
+function getSession(){ return _ADMIN_SESSION; }
+function setSession(s){ _ADMIN_SESSION = s || null; }
+function isAdmin(){ return _ADMIN_SESSION?.role === 'admin'; }
+
+/* ---------- In-memory data ---------- */
+let DATA = { phcs: [], customPilots: [] };
+const PUBLIC_ROUTES = new Set(['home','dashboard','impact','reports']);
+
+async function reloadData() {
+  delete _getCache['/api/phcs'];
+  delete _getCache['/api/pilots'];
+  try {
+    const [phcsRes, pilotsRes] = await Promise.all([
+      apiCall('GET', '/api/phcs'),
+      apiCall('GET', '/api/pilots').catch(() => [])
+    ]);
+    DATA.phcs = Array.isArray(phcsRes) ? phcsRes : [];
+    DATA.customPilots = Array.isArray(pilotsRes) ? pilotsRes : [];
+  }
+  catch(e) { console.error('Failed to load PHC data:', e); }
+}
+
+/* ---------- Utilities ---------- */
+const uid = ()=> 'id_'+Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+const fmt = n => (n===null||n===undefined||n==='') ? '–' : (typeof n==='number' ? n.toLocaleString('en-IN') : n);
+function el(html){ const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstChild; }
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function thisMonthKey(){ return new Date().toISOString().slice(0,7); }
+function monthLabel(key){
+  if(!key) return '';
+  const [y,m]=key.split('-');
+  return new Date(+y,+m-1,1).toLocaleString('en-US',{month:'short',year:'numeric'});
+}
+function getAllIndicators(){ return INDICATORS.concat(Array.isArray(DATA.customPilots)?DATA.customPilots:[]); }
+function getCustomPilots(){ return Array.isArray(DATA.customPilots)?DATA.customPilots:[]; }
+function latestDataMonth(phcs,months){
+  const monthList=(Array.isArray(months)&&months.length)?months:lastNMonthKeys(12);
+  const phcList=Array.isArray(phcs)?phcs.filter(Boolean):[];
+  const rev=[...monthList].reverse();
+  for(const m of rev){ for(const p of phcList){ if((p.monthlyData||{})[m]) return m; } }
+  return monthList[monthList.length-1] || thisMonthKey();
+}
+function lastNMonthKeys(n){
+  const out=[]; const d=new Date(); d.setDate(1);
+  for(let i=n-1;i>=0;i--){
+    const x=new Date(d.getFullYear(),d.getMonth()-i,1);
+    out.push(x.toISOString().slice(0,7));
+  }
+  return out;
+}
+const DATA_START_YEAR=2022;
+const DATA_START_MONTH=1;
+function allMonthKeysSince(){
+  const out=[]; const now=new Date();
+  const endY=now.getFullYear(), endM=now.getMonth()+1;
+  let y=DATA_START_YEAR,m=DATA_START_MONTH;
+  while(y<endY || (y===endY && m<=endM)){
+    out.push(`${y}-${String(m).padStart(2,'0')}`);
+    m++; if(m>12){ m=1; y++; }
+  }
+  return out;
+}
+function yearsSince(){
+  const out=[]; const endY=new Date().getFullYear();
+  for(let y=DATA_START_YEAR;y<=endY;y++) out.push(y);
+  return out;
+}
+function monthsInYear(year){
+  const now=new Date(); const endY=now.getFullYear(), endM=now.getMonth()+1;
+  const out=[]; const lastM=(year===endY)?endM:12;
+  for(let m=1;m<=lastM;m++) out.push(`${year}-${String(m).padStart(2,'0')}`);
+  return out;
+}
+function toast(msg,kind=''){
+  const t=document.getElementById('toast');
+  const node=el(`<div class="toast ${kind}">${escapeHtml(msg)}</div>`);
+  t.innerHTML=''; t.appendChild(node);
+  setTimeout(()=>{ if(node.parentNode) node.remove(); },2800);
+}
+
+/* ---------- Aggregations ---------- */
+function emptyMonthRecord(){
+  const r={};
+  getAllIndicators().forEach(ind=>{
+    r[ind.id]={};
+    ind.fields.forEach(f=>{ r[ind.id][f.k]=(f.type==='yesno'?'':0); });
+    if(ind.pilot) r[ind.id].notApplicable=false;
+  });
+  return r;
+}
+function ensureRecordHasAllIndicators(rec){
+  getAllIndicators().forEach(ind=>{
+    if(!rec[ind.id]) rec[ind.id]={};
+    ind.fields.forEach(f=>{ if(rec[ind.id][f.k]===undefined) rec[ind.id][f.k]=(f.type==='yesno'?'':0); });
+    if(ind.pilot && rec[ind.id].notApplicable===undefined) rec[ind.id].notApplicable=false;
+  });
+}
+function getPHC(id){ return DATA.phcs.find(p=>p.id===id); }
+function getMonthlyRecord(phc,monthKey){
+  if(!phc.monthlyData) phc.monthlyData={};
+  if(!phc.monthlyData[monthKey]) phc.monthlyData[monthKey]=emptyMonthRecord();
+  ensureRecordHasAllIndicators(phc.monthlyData[monthKey]);
+  return phc.monthlyData[monthKey];
+}
+function getLatestMonth(phc){
+  const keys=Object.keys(phc.monthlyData||{}).sort();
+  return keys.length?keys[keys.length-1]:null;
+}
+function sumIndicator(phcs,indicatorId,monthKey,fieldKey){
+  const list=Array.isArray(phcs)?phcs:[];
+  let sum=0; let any=false;
+  list.forEach(p=>{
+    const rec=(p.monthlyData||{})[monthKey];
+    if(rec&&rec[indicatorId]&&rec[indicatorId][fieldKey]!==undefined&&rec[indicatorId][fieldKey]!==''){
+      const v=Number(rec[indicatorId][fieldKey]);
+      if(!isNaN(v)){ sum+=v; any=true; }
+    }
+  });
+  return any?sum:null;
+}
+function indicatorSeries(phcs,indicatorId,fieldKey,months){
+  const monthList=Array.isArray(months)?months:[];
+  return monthList.map(m=>{ const v=sumIndicator(phcs,indicatorId,m,fieldKey); return v===null?0:v; });
+}
+function activePhcsForIndicator(phcs,indicatorId,monthKey){
+  const list=Array.isArray(phcs)?phcs:[];
+  return list.filter(p=>{
+    const rec=(p.monthlyData||{})[monthKey];
+    return !(rec && rec[indicatorId] && rec[indicatorId].notApplicable);
+  });
+}
+
+/* =========================================================================
+   ROUTER
+   ========================================================================= */
+const routes={};
+function registerRoute(name,fn){ routes[name]=fn; }
+
+let _currentRoute='home';
+let _currentParams=[];
+
+function go(route,params){
+  _currentRoute=route||'home';
+  _currentParams=params||[];
+  const hashTarget='#'+_currentRoute+(_currentParams.length?'/'+_currentParams.join('/'):'');
+  try{
+    if(location.hash!==hashTarget){
+      location.hash=hashTarget;
+      return;
+    }
+  }catch(e){}
+  render();
+}
+
+let _dataReady = false;
+function render(){
+  const fn=routes[_currentRoute]||routes.home;
+  document.querySelectorAll('#navMain a[data-route]').forEach(a=>{
+    a.classList.toggle('active',a.dataset.route===_currentRoute);
+  });
+  const app=document.getElementById('app');
+  if(app) app.innerHTML='';
+  if(!_dataReady && PUBLIC_ROUTES.has(_currentRoute)){
+    app.innerHTML='<div style="display:flex;flex-direction:column;gap:16px;padding:40px 24px;max-width:1200px;margin:0 auto">'+
+      '<div class="skeleton-bar" style="height:140px;border-radius:12px;background:linear-gradient(90deg,#e8edf5 25%,#d0d8e8 50%,#e8edf5 75%);background-size:400% 100%;animation:shimmer 1.4s infinite"></div>'+
+      '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">'+
+      [1,2,3,4,5,6].map(()=>'<div style="height:90px;border-radius:8px;background:linear-gradient(90deg,#e8edf5 25%,#d0d8e8 50%,#e8edf5 75%);background-size:400% 100%;animation:shimmer 1.4s infinite"></div>').join('')+
+      '</div></div>';
+    return;
+  }
+  fn(_currentParams);
+  try{ window.scrollTo({top:0,behavior:'instant'}); }catch(e){}
+}
+
+function navigate(){
+  const hash=(location.hash||'#home').replace(/^#/,'');
+  const [name,...params]=hash.split('/');
+  _currentRoute=name||'home';
+  _currentParams=params;
+  render();
+  if(PUBLIC_ROUTES.has(_currentRoute)){
+    reloadData().then(()=>{ _dataReady=true; if(PUBLIC_ROUTES.has(_currentRoute)) render(); });
+  }
+}
+
+window.addEventListener('hashchange',navigate);
+
+document.addEventListener('click',e=>{
+  let a=e.target.closest&&e.target.closest('a');
+  if(!a) return;
+  const href=a.getAttribute('href')||'';
+  if(href.startsWith('#')&&href.length>1){
+    e.preventDefault();
+    const target=href.slice(1);
+    const [name,...params]=target.split('/');
+    go(name,params);
+  }
+});
+
+/* =========================================================================
+   HOME
+   ========================================================================= */
+registerRoute('home',()=>{
+  const totalPHCs=DATA.phcs.length;
+  const phcs=DATA.phcs;
+  const month=latestDataMonth(phcs,lastNMonthKeys(12));
+  const opdMonth=sumIndicator(phcs,'opd',month,'value')||0;
+  const ipdMonth=sumIndicator(phcs,'ipd',month,'value')||0;
+  const delMonth=sumIndicator(phcs,'deliveries',month,'value')||0;
+  const labMonth=sumIndicator(phcs,'labTests',month,'value')||0;
+  let opdAll=0,ipdAll=0,delAll=0,labAll=0;
+  phcs.forEach(p=>{
+    Object.values(p.monthlyData||{}).forEach(r=>{
+      opdAll+=Number(r.opd?.value||0);
+      ipdAll+=Number(r.ipd?.value||0);
+      delAll+=Number(r.deliveries?.value||0);
+      labAll+=Number(r.labTests?.value||0);
+    });
+  });
+  document.getElementById('app').appendChild(el(`
+    <div class="page">
+      <section class="hero">
+        <h1>PHC Upgradation Srikakulam Dashboard</h1>
+        <p>A monitoring system for upgraded Primary Health Centres in Srikakulam.</p>
+        <div class="hero-cta">
+          <a class="btn" href="#dashboard">Open Dashboard</a>
+          <a class="btn btn-outline" href="#impact">View Impact Stories</a>
+          <a class="btn btn-outline" href="#reports">Download Reports</a>
+          <button class="btn btn-outline" onclick="openGeoModal()">Geographical Spread</button>
+        </div>
+      </section>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-label">Upgraded PHCs</div><div class="kpi-value">${fmt(totalPHCs)}</div><div class="kpi-sub">Total facilities tracked</div></div>
+        <div class="kpi"><div class="kpi-label">OPD Registrations &middot; ${monthLabel(month)}</div><div class="kpi-value">${fmt(opdMonth)}</div><div class="kpi-sub">All upgraded PHCs combined</div></div>
+        <div class="kpi"><div class="kpi-label">IPD Admissions &middot; ${monthLabel(month)}</div><div class="kpi-value">${fmt(ipdMonth)}</div><div class="kpi-sub">All upgraded PHCs combined</div></div>
+        <div class="kpi"><div class="kpi-label">Institutional Deliveries &middot; ${monthLabel(month)}</div><div class="kpi-value">${fmt(delMonth)}</div><div class="kpi-sub">All upgraded PHCs combined</div></div>
+        <div class="kpi"><div class="kpi-label">Lab Tests &middot; ${monthLabel(month)}</div><div class="kpi-value">${fmt(labMonth)}</div><div class="kpi-sub">All upgraded PHCs combined</div></div>
+        <div class="kpi"><div class="kpi-label">Cumulative OPD (all-time)</div><div class="kpi-value">${fmt(opdAll)}</div><div class="kpi-sub">Across all PHCs</div></div>
+        <div class="kpi"><div class="kpi-label">Cumulative IPD (all-time)</div><div class="kpi-value">${fmt(ipdAll)}</div><div class="kpi-sub">Across all PHCs</div></div>
+        <div class="kpi"><div class="kpi-label">Cumulative Deliveries (all-time)</div><div class="kpi-value">${fmt(delAll)}</div><div class="kpi-sub">Across all PHCs</div></div>
+        <div class="kpi"><div class="kpi-label">Cumulative Lab Tests (all-time)</div><div class="kpi-value">${fmt(labAll)}</div><div class="kpi-sub">Across all PHCs</div></div>
+      </div>
+      <div class="card mb-20">
+        <div class="card-head"><h3>Upgraded PHCs</h3><a class="btn btn-sm" href="#dashboard">Open all</a></div>
+        <div class="card-body">
+          ${phcs.length===0
+            ?`<div class="empty"><div class="em-icon">🏥</div><h4>No PHCs added yet</h4><p>Login as admin to start adding upgraded PHCs and monthly data.</p></div>`
+            :`<div class="phc-grid">${phcs.map(p=>`
+                <div class="phc-card">
+                  <h4>${escapeHtml(p.name)}</h4>
+                  <div class="phc-meta">${escapeHtml(p.mandal||'—')} &middot; Upgraded ${p.upgradedOn?new Date(p.upgradedOn).toLocaleDateString():'—'}</div>
+                  <div class="phc-meta">Latest data: ${getLatestMonth(p)?monthLabel(getLatestMonth(p)):'none'}</div>
+                  <div class="phc-actions">
+                    <a class="btn btn-sm" href="#dashboard/${p.id}">Dashboard</a>
+                    <a class="btn btn-sm" href="#impact/${p.id}">Impact</a>
+                    ${p.location?`<a class="btn btn-sm" href="${escapeHtml(p.location)}" target="_blank" rel="noopener">Map</a>`:''}
+                  </div>
+                </div>`).join('')}</div>`
+          }
+        </div>
+      </div>
+    </div>
+  `));
+});
+
+/* =========================================================================
+   DASHBOARD
+   ========================================================================= */
+registerRoute('dashboard',(params)=>{
+  const phcId=params[0];
+  const phc=phcId?getPHC(phcId):null;
+  const phcsScope=phcId?(phc?[phc]:[]):DATA.phcs;
+  const allMonths=allMonthKeysSince();
+  const years=yearsSince();
+  let selectedYear='all';
+  const monthsForView=()=>selectedYear==='all'?allMonths:monthsInYear(Number(selectedYear));
+  let months=monthsForView();
+  const defaultMonth=latestDataMonth(phcsScope,months);
+  let selectedMonth=defaultMonth;
+
+  const wrap=el(`<div class="page"></div>`);
+  const head=el(`
+    <div>
+      <div class="breadcrumb"><a href="#dashboard">Dashboard</a>${phc?' / '+escapeHtml(phc.name):' / Cumulative (All PHCs)'}</div>
+      <div class="page-head">
+        <div>
+          <h1 class="page-title">${phc?escapeHtml(phc.name):'Cumulative Dashboard'}</h1>
+          <p class="page-sub">${phc?escapeHtml(phc.mandal||''):`Across ${DATA.phcs.length} upgraded PHC${DATA.phcs.length===1?'':'s'} in Srikakulam district`}${phc&&phc.location?` &middot; <a href="${escapeHtml(phc.location)}" target="_blank" rel="noopener">View on Google Maps &rarr;</a>`:''}</p>
+        </div>
+        <div class="row-flex">
+          <button class="btn" id="btnDownloadPdf">Download PDF</button>
+          <button class="btn" id="btnDownloadCsv">Download CSV</button>
+        </div>
+      </div>
+    </div>
+  `);
+  wrap.appendChild(head);
+
+  const filter=el(`
+    <div class="filter-bar">
+      <div class="field"><label>Month</label>
+        <select id="monthSel">${months.slice().reverse().map(m=>`<option value="${m}"${m===defaultMonth?' selected':''}>${monthLabel(m)}</option>`).join('')}</select>
+      </div>
+      <div class="field"><label>Year</label>
+        <select id="yearSel">
+          <option value="all" selected>All years (Jan 2022-present)</option>
+          ${years.slice().reverse().map(y=>`<option value="${y}">${y}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>View</label>
+        <select id="phcSel">
+          <option value="">Cumulative (All PHCs)</option>
+          ${DATA.phcs.map(p=>`<option value="${p.id}"${p.id===phcId?' selected':''}>${escapeHtml(p.name)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="grow"></div>
+      <span class="muted" style="font-size:12.5px">Trend charts span Jan 2022 to current month</span>
+    </div>
+  `);
+  wrap.appendChild(filter);
+
+  if(DATA.phcs.length===0){
+    wrap.appendChild(el(`<div class="empty"><div class="em-icon">🏥</div><h4>No PHCs yet</h4><p>Login as admin to add upgraded PHCs and start capturing monthly indicator data.</p></div>`));
+    document.getElementById('app').appendChild(wrap);
+    return;
+  }
+
+  const kpiHost=el(`<div></div>`); wrap.appendChild(kpiHost);
+  const chartsHost=el(`<div class="chart-grid"></div>`); wrap.appendChild(chartsHost);
+  document.getElementById('app').appendChild(wrap);
+
+  function renderView(){
+    selectedYear=filter.querySelector('#yearSel').value;
+    months=monthsForView();
+    const monthSel=filter.querySelector('#monthSel');
+    const prevMonth=monthSel.value;
+    monthSel.innerHTML=months.slice().reverse().map(m=>`<option value="${m}">${monthLabel(m)}</option>`).join('');
+    monthSel.value=months.includes(prevMonth)?prevMonth:latestDataMonth(phcsScope,months);
+    selectedMonth=filter.querySelector('#monthSel').value;
+    const newPhcId=filter.querySelector('#phcSel').value;
+    const scopePhcs=newPhcId?[getPHC(newPhcId)].filter(Boolean):DATA.phcs;
+    if(newPhcId!==(phcId||'')){ go('dashboard',newPhcId?[newPhcId]:[]); return; }
+    drawKpis(kpiHost,scopePhcs,selectedMonth);
+    drawCharts(chartsHost,scopePhcs,months);
+  }
+  filter.querySelector('#monthSel').addEventListener('change',renderView);
+  filter.querySelector('#yearSel').addEventListener('change',renderView);
+  filter.querySelector('#phcSel').addEventListener('change',renderView);
+  renderView();
+
+  wrap.querySelector('#btnDownloadPdf').addEventListener('click',()=>downloadDashboardPDF(phcsScope,phc,selectedMonth,months));
+  wrap.querySelector('#btnDownloadCsv').addEventListener('click',()=>downloadDashboardCSV(phcsScope,phc,months));
+});
+
+function drawKpis(host,phcs,month){
+  phcs=Array.isArray(phcs)?phcs:[];
+  const opd=sumIndicator(phcs,'opd',month,'value');
+  const ipd=sumIndicator(phcs,'ipd',month,'value');
+  const del=sumIndicator(phcs,'deliveries',month,'value');
+  const lab=sumIndicator(phcs,'labTests',month,'value');
+  const cancerKpi=(id,label)=>{
+    const active=activePhcsForIndicator(phcs,id,month);
+    const s=sumIndicator(active,id,month,'screened');
+    const p=sumIndicator(active,id,month,'positive');
+    return `<div class="kpi"><div class="kpi-label">${escapeHtml(label)}</div><div class="kpi-value">${fmt(s)}</div><div class="kpi-mini"><span class="pill pill-bad">${fmt(p||0)} positive</span><span class="muted">${active.length}/${phcs.length} active</span></div></div>`;
+  };
+  const trnSum=sumIndicator(phcs,'training',month,'count');
+  let indYes=0,indTot=0;
+  phcs.forEach(p=>{ const r=(p.monthlyData||{})[month]; if(r&&r.drugIndent&&r.drugIndent.status){ indTot++; if(String(r.drugIndent.status).toLowerCase()==='yes') indYes++; } });
+  const hrSanc=['moSanc','snSanc','ltSanc','poSanc'].reduce((s,k)=>s+(sumIndicator(phcs,'hr',month,k)||0),0);
+  const hrFill=['moFilled','snFilled','ltFilled','poFilled'].reduce((s,k)=>s+(sumIndicator(phcs,'hr',month,k)||0),0);
+  const eq=['computers','deliveryBed','lamp','paraMonitor','coag','doppler'].reduce((s,k)=>s+(sumIndicator(phcs,'equipment',month,k)||0),0);
+  let bmwYes=0,bmwTot=0;
+  phcs.forEach(p=>{ const r=(p.monthlyData||{})[month]; if(r&&r.bmw&&r.bmw.status){ bmwTot++; if(String(r.bmw.status).toLowerCase()==='yes') bmwYes++; } });
+  host.innerHTML=`
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">OPD Registrations</div><div class="kpi-value">${fmt(opd)}</div><div class="kpi-sub">${monthLabel(month)}</div></div>
+      <div class="kpi"><div class="kpi-label">IPD Admissions</div><div class="kpi-value">${fmt(ipd)}</div><div class="kpi-sub">${monthLabel(month)}</div></div>
+      <div class="kpi"><div class="kpi-label">Institutional Deliveries</div><div class="kpi-value">${fmt(del)}</div><div class="kpi-sub">${monthLabel(month)}</div></div>
+      <div class="kpi"><div class="kpi-label">Lab Tests</div><div class="kpi-value">${fmt(lab)}</div><div class="kpi-sub">${monthLabel(month)}</div></div>
+      ${cancerKpi('oral','Oral Cancer Screening')}
+      ${cancerKpi('breast','Breast Cancer Screening')}
+      ${cancerKpi('cervical','Cervical Cancer Screening')}
+      ${getCustomPilots().map(p=>cancerKpi(p.id,p.label)).join('')}
+      <div class="kpi"><div class="kpi-label">Staff Training Coverage</div><div class="kpi-value">${fmt(trnSum)}</div><div class="kpi-sub">Combined monthly trained staff</div></div>
+      <div class="kpi"><div class="kpi-label">Drug Indent Submission</div><div class="kpi-value">${indTot?`${indYes}/${indTot}`:'–'}</div><div class="kpi-sub">Yes / Reported PHCs</div></div>
+      <div class="kpi"><div class="kpi-label">HR Availability (filled / sanctioned)</div><div class="kpi-value">${fmt(hrFill)} / ${fmt(hrSanc)}</div><div class="kpi-sub">MO + SN + LT + Pharm.</div></div>
+      <div class="kpi"><div class="kpi-label">Equipment Downtime (days)</div><div class="kpi-value">${fmt(eq)}</div><div class="kpi-sub">Sum across 6 equipment types</div></div>
+      <div class="kpi"><div class="kpi-label">BMW Compliance</div><div class="kpi-value">${bmwTot?`${bmwYes}/${bmwTot}`:'–'}</div><div class="kpi-sub">PHCs with functional BMW segregation</div></div>
+    </div>`;
+}
+
+let _charts=[];
+function destroyCharts(){ _charts.forEach(c=>{ try{c.destroy();}catch(e){} }); _charts=[]; }
+function makeChart(host,title,build){
+  const card=el(`<div class="card chart-card"><div class="card-head"><h3>${title}</h3></div><div class="chart-wrap"><canvas></canvas></div></div>`);
+  host.appendChild(card);
+  const ctx=card.querySelector('canvas').getContext('2d');
+  _charts.push(new Chart(ctx,build()));
+}
+function drawCharts(host,phcs,months){
+  phcs=Array.isArray(phcs)?phcs:[];
+  months=Array.isArray(months)?months:[];
+  destroyCharts(); host.innerHTML='';
+  const labels=months.map(monthLabel);
+  const blue='rgba(47,107,220,1)',blueFill='rgba(47,107,220,.18)',blueAlt='rgba(23,63,140,1)',blueAltFill='rgba(23,63,140,.15)';
+  const lineCfg=(label,data,color,fill)=>({type:'line',data:{labels,datasets:[{label,data,borderColor:color,backgroundColor:fill,fill:true,tension:.35,borderWidth:2,pointRadius:3,pointHoverRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{font:{size:11}}}},scales:{y:{beginAtZero:true,ticks:{font:{size:11}},grid:{color:'#eef2f7'}},x:{ticks:{font:{size:11}},grid:{display:false}}}}});
+  const barCfg=(datasets)=>({type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{font:{size:11}}}},scales:{y:{beginAtZero:true,ticks:{font:{size:11}},grid:{color:'#eef2f7'}},x:{ticks:{font:{size:11}},grid:{display:false}}}}});
+  makeChart(host,'OPD Registrations — Trend',()=>lineCfg('OPD Registrations',indicatorSeries(phcs,'opd','value',months),blue,blueFill));
+  makeChart(host,'IPD Admissions — Trend',()=>lineCfg('IPD Admissions',indicatorSeries(phcs,'ipd','value',months),blueAlt,blueAltFill));
+  makeChart(host,'Institutional Deliveries — Trend',()=>lineCfg('Institutional Deliveries',indicatorSeries(phcs,'deliveries','value',months),blue,blueFill));
+  makeChart(host,'Lab Tests — Trend',()=>lineCfg('Lab Tests',indicatorSeries(phcs,'labTests','value',months),blueAlt,blueAltFill));
+  makeChart(host,'Oral Cancer Screening (Screened / Positive / Referred / Treatment)',()=>barCfg([{label:'Screened',data:indicatorSeries(phcs,'oral','screened',months),backgroundColor:'rgba(47,107,220,.85)'},{label:'Positive',data:indicatorSeries(phcs,'oral','positive',months),backgroundColor:'rgba(220,38,38,.85)'},{label:'Referred',data:indicatorSeries(phcs,'oral','referred',months),backgroundColor:'rgba(217,119,6,.85)'},{label:'Treatment Initiated',data:indicatorSeries(phcs,'oral','treatmentInitiated',months),backgroundColor:'rgba(22,163,74,.85)'}]));
+  makeChart(host,'Breast Cancer Screening (Screened / Positive / Referred / Treatment)',()=>barCfg([{label:'Screened',data:indicatorSeries(phcs,'breast','screened',months),backgroundColor:'rgba(47,107,220,.85)'},{label:'Positive',data:indicatorSeries(phcs,'breast','positive',months),backgroundColor:'rgba(220,38,38,.85)'},{label:'Referred',data:indicatorSeries(phcs,'breast','referred',months),backgroundColor:'rgba(217,119,6,.85)'},{label:'Treatment Initiated',data:indicatorSeries(phcs,'breast','treatmentInitiated',months),backgroundColor:'rgba(22,163,74,.85)'}]));
+  makeChart(host,'Cervical Cancer Screening (Screened / Positive / Referred / Treatment)',()=>barCfg([{label:'Screened',data:indicatorSeries(phcs,'cervical','screened',months),backgroundColor:'rgba(47,107,220,.85)'},{label:'Positive',data:indicatorSeries(phcs,'cervical','positive',months),backgroundColor:'rgba(220,38,38,.85)'},{label:'Referred',data:indicatorSeries(phcs,'cervical','referred',months),backgroundColor:'rgba(217,119,6,.85)'},{label:'Treatment Initiated',data:indicatorSeries(phcs,'cervical','treatmentInitiated',months),backgroundColor:'rgba(22,163,74,.85)'}]));
+  getCustomPilots().forEach(pilot=>{
+    makeChart(host,`${pilot.label} (Screened / Positive / Referred / Treatment)`,()=>barCfg([{label:'Screened',data:indicatorSeries(phcs,pilot.id,'screened',months),backgroundColor:'rgba(47,107,220,.85)'},{label:'Positive',data:indicatorSeries(phcs,pilot.id,'positive',months),backgroundColor:'rgba(220,38,38,.85)'},{label:'Referred',data:indicatorSeries(phcs,pilot.id,'referred',months),backgroundColor:'rgba(217,119,6,.85)'},{label:'Treatment Initiated',data:indicatorSeries(phcs,pilot.id,'treatmentInitiated',months),backgroundColor:'rgba(22,163,74,.85)'}]));
+  });
+  makeChart(host,'Staff Training Coverage (Combined Count)',()=>lineCfg('Staff Trained',indicatorSeries(phcs,'training','count',months),blue,blueFill));
+  const indentYesSeries=months.map(m=>phcs.reduce((s,p)=>{ const r=(p.monthlyData||{})[m]; return s + ((r && r.drugIndent && String(r.drugIndent.status).toLowerCase()==='yes')?1:0); },0));
+  const indentNoSeries=months.map(m=>phcs.reduce((s,p)=>{ const r=(p.monthlyData||{})[m]; return s + ((r && r.drugIndent && String(r.drugIndent.status).toLowerCase()==='no')?1:0); },0));
+  makeChart(host,'Essential Drug Indent Submission Status',()=>barCfg([{label:'Yes',data:indentYesSeries,backgroundColor:'rgba(22,163,74,.85)'},{label:'No',data:indentNoSeries,backgroundColor:'rgba(220,38,38,.75)'}]));
+  makeChart(host,'HR Availability (Filled vs Sanctioned)',()=>barCfg([{label:'Sanctioned',data:months.map(m=>['moSanc','snSanc','ltSanc','poSanc'].reduce((s,k)=>s+(sumIndicator(phcs,'hr',m,k)||0),0)),backgroundColor:'rgba(47,107,220,.55)'},{label:'Filled',data:months.map(m=>['moFilled','snFilled','ltFilled','poFilled'].reduce((s,k)=>s+(sumIndicator(phcs,'hr',m,k)||0),0)),backgroundColor:'rgba(22,163,74,.85)'}]));
+  makeChart(host,'Equipment Downtime (Days)',()=>barCfg([{label:'Computers',data:indicatorSeries(phcs,'equipment','computers',months),backgroundColor:'rgba(47,107,220,.85)'},{label:'Delivery Bed',data:indicatorSeries(phcs,'equipment','deliveryBed',months),backgroundColor:'rgba(23,63,140,.85)'},{label:'Ceiling Lamp',data:indicatorSeries(phcs,'equipment','lamp',months),backgroundColor:'rgba(90,141,240,.85)'},{label:'Para Monitor',data:indicatorSeries(phcs,'equipment','paraMonitor',months),backgroundColor:'rgba(217,119,6,.85)'},{label:'Coagulation Analyser',data:indicatorSeries(phcs,'equipment','coag',months),backgroundColor:'rgba(220,38,38,.75)'},{label:'Foetal Doppler',data:indicatorSeries(phcs,'equipment','doppler',months),backgroundColor:'rgba(142,182,255,.95)'}]));
+  const bmwYesSeries=months.map(m=>phcs.reduce((s,p)=>{const r=(p.monthlyData||{})[m];return s+((r&&r.bmw&&String(r.bmw.status).toLowerCase()==='yes')?1:0);},0));
+  const bmwNoSeries=months.map(m=>phcs.reduce((s,p)=>{const r=(p.monthlyData||{})[m];return s+((r&&r.bmw&&String(r.bmw.status).toLowerCase()==='no')?1:0);},0));
+  makeChart(host,'BMW Compliance (PHCs with Functional BMW Segregation)',()=>barCfg([{label:'Yes (Functional)',data:bmwYesSeries,backgroundColor:'rgba(22,163,74,.85)'},{label:'No (Non-functional)',data:bmwNoSeries,backgroundColor:'rgba(220,38,38,.75)'}]));
+}
+
+/* =========================================================================
+   IMPACT
+   ========================================================================= */
+registerRoute('impact',(params)=>{
+  const phcId=params[0];
+  const phc=phcId?getPHC(phcId):null;
+  const wrap=el(`<div class="page"></div>`);
+  wrap.appendChild(el(`
+    <div>
+      <div class="breadcrumb"><a href="#impact">Impact</a>${phc?' / '+escapeHtml(phc.name):' / Cumulative (All PHCs)'}</div>
+      <div class="page-head">
+        <div>
+          <h1 class="page-title">${phc?`Impact — ${escapeHtml(phc.name)}`:'Impact — All PHCs'}</h1>
+          <p class="page-sub">Case stories, videos, dignitary visits, photographs and overall impact narrative.</p>
+        </div>
+        <div class="row-flex">
+          <div class="field" style="flex-direction:row;align-items:center;gap:8px;margin:0">
+            <label style="margin:0">View</label>
+            <select id="phcSelImpact">
+              <option value="">Cumulative (All PHCs)</option>
+              ${DATA.phcs.map(p=>`<option value="${p.id}"${p.id===phcId?' selected':''}>${escapeHtml(p.name)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field" style="flex-direction:row;align-items:center;gap:8px;margin:0">
+            <label style="margin:0">Year</label>
+            <select id="yearSelImpact">
+              <option value="all" selected>All years (since 2022)</option>
+              ${yearsSince().slice().reverse().map(y=>`<option value="${y}">${y}</option>`).join('')}
+            </select>
+          </div>
+          <button class="btn" id="btnImpactPdf">Download PDF</button>
+        </div>
+      </div>
+    </div>
+  `));
+  wrap.querySelector('#phcSelImpact').addEventListener('change',e=>{ const v=e.target.value; go('impact',v?[v]:[]); });
+  let selectedImpactYear='all';
+  wrap.querySelector('#yearSelImpact').addEventListener('change',e=>{ selectedImpactYear=e.target.value; renderTab(tabs.querySelector('.impact-tab.active')?.dataset.tab||'cases'); });
+  const tabs=el(`
+    <div class="impact-tabs" role="tablist">
+      <button class="impact-tab active" data-tab="cases">Case Stories</button>
+      <button class="impact-tab" data-tab="videos">Videos</button>
+      <button class="impact-tab" data-tab="dignitaries">Dignitary Visits</button>
+      <button class="impact-tab" data-tab="pictures">Pictures</button>
+      <button class="impact-tab" data-tab="overall">Overall Impact</button>
+    </div>
+  `);
+  wrap.appendChild(tabs);
+  const body=el(`<div></div>`); wrap.appendChild(body);
+  const scopePhcs=phc?[phc]:DATA.phcs;
+  function inYear(item){
+    if(selectedImpactYear==='all') return true;
+    return String(item?.date||'').startsWith(String(selectedImpactYear));
+  }
+  function collect(key){ const rows=[]; scopePhcs.forEach(p=>{ ((p.impact||{})[key]||[]).forEach(item=>{ if(inYear(item)) rows.push({...item,_phcName:p.name,_phcId:p.id}); }); }); return rows; }
+  function emptyBlock(t,p){ return el(`<div class="empty"><div class="em-icon">📭</div><h4>${escapeHtml(t)}</h4><p>${escapeHtml(p)}</p></div>`); }
+  function toEmbedUrl(u){
+    if(!u) return '';
+    try{
+      const url=new URL(u);
+      if(url.hostname.includes('youtube.com')){ const id=url.searchParams.get('v'); if(id) return `https://www.youtube.com/embed/${id}`; if(url.pathname.startsWith('/embed/')) return u; }
+      if(url.hostname==='youtu.be') return `https://www.youtube.com/embed/${url.pathname.slice(1)}`;
+      if(url.hostname.includes('vimeo.com')){ const id=url.pathname.split('/').filter(Boolean).pop(); if(id) return `https://player.vimeo.com/video/${id}`; }
+      return u;
+    }catch(e){ return ''; }
+  }
+
+  function renderTab(tab){
+    tabs.querySelectorAll('.impact-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+    body.innerHTML='';
+
+    if(tab==='cases'){
+      const items=collect('caseStories');
+      if(!items.length){ body.appendChild(emptyBlock('No case stories yet','Login as admin to add a case story.')); return; }
+      const grid=el(`<div class="case-grid"></div>`);
+      // Build lightbox items for all images in this view
+      const lbItems=[];
+      items.forEach(c=>{
+        const images=Array.isArray(c.images)?c.images:[];
+        images.forEach(src=>lbItems.push({src,caption:`${c.title||''} — ${c._phcName||''}`}));
+      });
+      let lbOffset=0;
+      items.forEach(c=>{
+        const images=Array.isArray(c.images)?c.images:[];
+        const myOffset=lbOffset;
+        lbOffset+=images.length;
+        const imgHtml=images[0]
+          ? `<img src="${escapeHtml(images[0])}" alt="${escapeHtml(c.title||'')}" class="case-card-img" data-lb-offset="${myOffset}" style="cursor:pointer">`
+          : '';
+        const card=el(`<div class="case-card">${imgHtml}<div class="case-card-body"><h4>${escapeHtml(c.title||'Untitled')}</h4><div class="case-meta">${escapeHtml(c._phcName)}${c.date?' &middot; '+escapeHtml(c.date):''}</div><p>${escapeHtml(c.content||'')}</p>${images.length>1?`<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">${images.slice(1).map((src,i)=>`<img src="${escapeHtml(src)}" data-lb-offset="${myOffset+1+i}" style="width:60px;height:60px;object-fit:cover;border-radius:6px;cursor:pointer;border:1px solid var(--line)">`).join('')}</div>`:''}</div></div>`);
+        card.querySelectorAll('[data-lb-offset]').forEach(img=>{
+          img.addEventListener('click',()=>openLightbox(lbItems, parseInt(img.dataset.lbOffset)));
+        });
+        grid.appendChild(card);
+      });
+      body.appendChild(grid);
+
+    } else if(tab==='videos'){
+      const items=collect('videos');
+      if(!items.length){ body.appendChild(emptyBlock('No videos yet','Login as admin to add video URLs or upload clips (max 25MB).')); return; }
+      const grid=el(`<div class="video-grid"></div>`);
+      items.forEach(v=>{
+        const hasUpload=String(v.videoData||'').startsWith('data:video/');
+        const url=toEmbedUrl(v.url||'');
+        const media=hasUpload
+          ? `<video class="video-frame" controls><source src="${escapeHtml(v.videoData)}"></video>`
+          : (url
+            ? `<iframe class="video-frame" src="${escapeHtml(url)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+            : `<div class="video-frame" style="display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px">Invalid video URL</div>`);
+        grid.appendChild(el(`<div class="video-card">${media}<div class="video-info"><h4>${escapeHtml(v.title||'Untitled')}</h4><p>${escapeHtml(v._phcName)}${v.description?' — '+escapeHtml(v.description):''}</p></div></div>`));
+      });
+      body.appendChild(grid);
+
+    } else if(tab==='dignitaries'){
+      const items=collect('dignitaryVisits');
+      if(!items.length){ body.appendChild(emptyBlock('No dignitary visits recorded','Login as admin to add visit details.')); return; }
+      const lbItems=[];
+      items.forEach(d=>{
+        const photos=Array.isArray(d.photos)&&d.photos.length?d.photos:(d.photo?[d.photo]:[]);
+        photos.forEach(src=>lbItems.push({src,caption:`${d.dignitary||''} — ${d._phcName||''}`}));
+      });
+      let lbOffset=0;
+      const grid=el(`<div class="dignitary-grid"></div>`);
+      items.forEach(d=>{
+        const photos=Array.isArray(d.photos)&&d.photos.length?d.photos:(d.photo?[d.photo]:[]);
+        const myOffset=lbOffset; lbOffset+=photos.length;
+        const p0=photos[0]||'';
+        const card=el(`<div class="case-card">${p0?`<img src="${escapeHtml(p0)}" alt="" class="case-card-img" data-lb-offset="${myOffset}" style="cursor:pointer">`:''}<div class="case-card-body"><h4>${escapeHtml(d.dignitary||'Unnamed')}</h4><div class="case-meta">${escapeHtml(d._phcName)}${d.date?' &middot; '+escapeHtml(d.date):''}</div><p>${escapeHtml(d.purpose||'')}</p></div></div>`);
+        card.querySelectorAll('[data-lb-offset]').forEach(img=>{
+          img.addEventListener('click',()=>openLightbox(lbItems,parseInt(img.dataset.lbOffset)));
+        });
+        grid.appendChild(card);
+      });
+      body.appendChild(grid);
+
+    } else if(tab==='pictures'){
+      // ── LAZY LOAD PICTURES ──
+      const items=collect('pictures'); // has id, caption, _phcId, _phcName; dataUrl is empty
+      if(!items.length){ body.appendChild(emptyBlock('No pictures yet','Login as admin to upload pictures.')); return; }
+
+      const grid=el(`<div class="picture-grid"></div>`);
+      // Render skeleton placeholders immediately
+      items.forEach(pic=>{
+        const tile=el(`<div class="picture-tile" id="pic-tile-${escapeHtml(pic.id)}">
+          <div class="pic-skeleton"></div>
+          <div class="picture-caption">${escapeHtml(pic.caption||pic._phcName||'')}</div>
+        </div>`);
+        grid.appendChild(tile);
+      });
+      body.appendChild(grid);
+
+      // Collect unique PHC IDs in this view
+      const phcIds=[...new Set(items.map(pic=>pic._phcId))];
+
+      // Per-PHC lazy fetch — then build lightbox and populate tiles
+      let allLoadedPics={}; // phcId -> [{id,caption,data_url}]
+      let loadedCount=0;
+
+      phcIds.forEach(async phcId=>{
+        const pics=await loadPictures(phcId);
+        allLoadedPics[phcId]=pics;
+        loadedCount++;
+
+        // Inject images into tiles for this PHC
+        pics.forEach(pic=>{
+          const tile=document.getElementById('pic-tile-'+pic.id);
+          if(!tile) return;
+          const src=pic.data_url||'';
+          if(!src){ tile.querySelector('.pic-skeleton').style.background='#eef2f7'; return; }
+          const imgEl=document.createElement('img');
+          imgEl.alt=pic.caption||'';
+          imgEl.onload=()=>{ tile.querySelector('.pic-skeleton')?.remove(); };
+          imgEl.src=src;
+          tile.insertBefore(imgEl, tile.querySelector('.picture-caption'));
+        });
+
+        // Once all PHCs loaded, wire up lightbox on tiles
+        if(loadedCount===phcIds.length){
+          // Rebuild full picture list in display order for lightbox
+          const lbItems=[];
+          items.forEach(item=>{
+            const phcPics=allLoadedPics[item._phcId]||[];
+            const full=phcPics.find(p=>p.id===item.id);
+            if(full&&full.data_url) lbItems.push({src:full.data_url,caption:full.caption||item._phcName||''});
+          });
+          items.forEach((item,idx)=>{
+            const tile=document.getElementById('pic-tile-'+item.id);
+            if(!tile) return;
+            const myLbIdx=lbItems.findIndex(x=>x.caption===(((allLoadedPics[item._phcId]||[]).find(p=>p.id===item.id)||{}).caption||item._phcName||'') && lbItems.indexOf(x)>=idx-2);
+            tile.addEventListener('click',()=>openLightbox(lbItems, Math.max(0,idx)));
+          });
+        }
+      });
+
+    } else if(tab==='overall'){
+      if(!scopePhcs.length){ body.appendChild(emptyBlock('No data','No PHCs to display.')); return; }
+      const blocks=[];
+      scopePhcs.forEach(p=>{ const text=((p.impact||{}).overallImpact||'').trim(); if(text) blocks.push(`<h3 style="margin:18px 0 8px;color:var(--blue-700)">${escapeHtml(p.name)}</h3><div class="overall-impact">${escapeHtml(text)}</div>`); });
+      body.innerHTML=blocks.length?blocks.join(''):'';
+      if(!blocks.length) body.appendChild(emptyBlock('No overall impact narrative yet','Login as admin to write the overall impact narrative for each PHC.'));
+    }
+  }
+
+  tabs.querySelectorAll('.impact-tab').forEach(b=>b.addEventListener('click',()=>renderTab(b.dataset.tab)));
+  renderTab('cases');
+  document.getElementById('app').appendChild(wrap);
+  wrap.querySelector('#btnImpactPdf').addEventListener('click',()=>downloadImpactPDF(scopePhcs,phc));
+});
+
+/* =========================================================================
+   REPORTS
+   ========================================================================= */
+registerRoute('reports',()=>{
+  const wrap=el(`<div class="page">
+    <div class="page-head"><div><h1 class="page-title">Reports</h1><p class="page-sub">Download dashboard and impact reports — cumulative or per PHC.</p></div></div>
+    <div class="card mb-20">
+      <div class="card-head"><h3>Cumulative Reports (All PHCs)</h3></div>
+      <div class="card-body row-flex">
+        <button class="btn btn-primary" id="cumDashPdf">Cumulative Dashboard (PDF)</button>
+        <button class="btn" id="cumDashCsv">Cumulative Dashboard (CSV)</button>
+        <button class="btn btn-primary" id="cumImpPdf">Cumulative Impact (PDF)</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>PHC-wise Reports</h3></div>
+      <div class="card-body">
+        ${DATA.phcs.length===0
+          ?`<div class="empty"><div class="em-icon">🏥</div><h4>No PHCs yet</h4><p>Add PHCs from the admin panel.</p></div>`
+          :`<table class="table"><thead><tr><th>PHC</th><th>Mandal</th><th>Latest Data</th><th class="right">Reports</th></tr></thead>
+            <tbody>${DATA.phcs.map(p=>`<tr>
+              <td><strong>${escapeHtml(p.name)}</strong></td>
+              <td>${escapeHtml(p.mandal||'—')}</td>
+              <td>${getLatestMonth(p)?monthLabel(getLatestMonth(p)):'—'}</td>
+              <td class="right">
+                <button class="btn btn-sm" data-act="dash-pdf" data-id="${p.id}">Dashboard PDF</button>
+                <button class="btn btn-sm" data-act="dash-csv" data-id="${p.id}">Dashboard CSV</button>
+                <button class="btn btn-sm" data-act="imp-pdf" data-id="${p.id}">Impact PDF</button>
+              </td>
+            </tr>`).join('')}</tbody></table>`
+        }
+      </div>
+    </div>
+  </div>`);
+  document.getElementById('app').appendChild(wrap);
+  const months=lastNMonthKeys(12);
+  wrap.querySelector('#cumDashPdf').addEventListener('click',()=>downloadDashboardPDF(DATA.phcs,null,latestDataMonth(DATA.phcs,months),months));
+  wrap.querySelector('#cumDashCsv').addEventListener('click',()=>downloadDashboardCSV(DATA.phcs,null,months));
+  wrap.querySelector('#cumImpPdf').addEventListener('click',()=>downloadImpactPDF(DATA.phcs,null));
+  wrap.querySelectorAll('button[data-act]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const phc=getPHC(b.dataset.id); if(!phc) return;
+      if(b.dataset.act==='dash-pdf') downloadDashboardPDF([phc],phc,latestDataMonth([phc],months),months);
+      else if(b.dataset.act==='dash-csv') downloadDashboardCSV([phc],phc,months);
+      else if(b.dataset.act==='imp-pdf') downloadImpactPDF([phc],phc);
+    });
+  });
+});
+
+/* =========================================================================
+   LOGIN
+   ========================================================================= */
+registerRoute('login',()=>{
+  if(_ADMIN_SESSION){ goAdmin(); return; }
+  const wrap=el(`<div class="login-wrap"><div class="login-card">
+    <h2>Sign In</h2>
+    <p>Sign in to manage PHCs, monthly data, and impact content.</p>
+    <div class="field"><label>Username</label><input id="lu" type="text" spellcheck="false" autocapitalize="off" autocomplete="username"></div>
+    <div class="field"><label>Password</label><input id="lp" type="password" autocomplete="current-password"></div>
+    <button class="btn btn-primary" type="button" id="signInBtn" style="width:100%;justify-content:center;padding:11px;margin-top:4px">Sign In</button>
+    <div class="login-hint">Enter your username and password to access the management panel.</div>
+  </div></div>`);
+  document.getElementById('app').appendChild(wrap);
+
+  async function attempt(){
+    const u=(wrap.querySelector('#lu').value||'').trim();
+    const p=wrap.querySelector('#lp').value;
+    if(!u||!p){ toast('Enter username and password','error'); return; }
+    try{
+      const result=await apiCall('POST','/api/login',{username:u,password:p});
+      setSession({token:result.token,username:result.username,role:result.role||'admin'});
+      refreshNav();
+      toast('Welcome, '+result.username,'success');
+      goAdmin();
+    }catch(e){ toast(e.message||'Invalid credentials','error'); }
+  }
+  wrap.querySelector('#signInBtn').addEventListener('click',attempt);
+  wrap.querySelector('#lp').addEventListener('keydown',e=>{ if(e.key==='Enter') attempt(); });
+  wrap.querySelector('#lu').addEventListener('keydown',e=>{ if(e.key==='Enter') attempt(); });
+});
+
+function goAdmin(){ go('admin',[]); }
+
+/* =========================================================================
+   ADMIN
+   ========================================================================= */
+registerRoute('admin',()=>{
+  if(!_ADMIN_SESSION){ go('login'); return; }
+  const wrap=el(`<div class="page">
+    <div class="page-head"><div><h1 class="page-title">${isAdmin()?'Admin Panel':'Data Entry Panel'}</h1><p class="page-sub">${isAdmin()?'Manage upgraded PHCs, monthly indicator data, and impact content.':'Enter monthly indicator data and manage impact content.'}</p></div></div>
+    <div class="tabs" id="adminTabs">
+      <button class="active" data-tab="phcs">PHCs</button>
+      <button data-tab="pilots">Pilot Programmes</button>
+      <button data-tab="monthly">Monthly Data Entry</button>
+      <button data-tab="impact">Impact Content</button>
+      ${isAdmin()?'<button data-tab="users">Users</button><button data-tab="settings">Settings</button>':''}
+    </div>
+    <div id="adminBody"></div>
+  </div>`);
+  document.getElementById('app').appendChild(wrap);
+  const body=wrap.querySelector('#adminBody');
+  wrap.querySelectorAll('#adminTabs button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      wrap.querySelectorAll('#adminTabs button').forEach(x=>x.classList.toggle('active',x===b));
+      renderAdminTab(b.dataset.tab,body);
+    });
+  });
+  renderAdminTab('phcs',body);
+});
+
+function renderAdminTab(tab,body){
+  body.innerHTML='';
+  if(tab==='phcs')     return renderAdminPHCs(body);
+  if(tab==='pilots')   return renderAdminPilots(body);
+  if(tab==='monthly')  return renderAdminMonthly(body);
+  if(tab==='impact')   return renderAdminImpact(body);
+  if(tab==='users')    return renderAdminUsers(body);
+  if(tab==='settings') return renderAdminSettings(body);
+}
+
+function defaultPilotFields(){
+  return [
+    {k:'screened',l:'Cases Screened'},
+    {k:'positive',l:'Positive Cases'},
+    {k:'referred',l:'Referred to Higher Facility'},
+    {k:'treatmentInitiated',l:'Treatment Initiated'}
+  ];
+}
+
+function renderAdminPilots(body){
+  const pilots=getCustomPilots();
+  const card=el(`<div class="card">
+    <div class="card-head">
+      <div>
+        <h3>Pilot Programmes (${pilots.length})</h3>
+        <span class="muted" style="font-size:12.5px">Built-in cancer screenings are always included. Pilots added here follow the same flow.</span>
+      </div>
+      <button class="btn btn-primary btn-sm" id="addPilot">+ Add Pilot</button>
+    </div>
+    <div class="card-body">
+      ${pilots.length===0
+        ?`<div class="empty"><div class="em-icon">P</div><h4>No custom pilots yet</h4><p>Add a pilot programme to surface it in monthly entry and reports.</p></div>`
+        :`<table class="table"><thead><tr><th>Pilot</th><th>Fields</th><th class="right">Actions</th></tr></thead>
+          <tbody>${pilots.map(p=>`<tr><td><strong>${escapeHtml(p.label)}</strong></td><td class="muted">${(p.fields||[]).map(f=>escapeHtml(f.l)).join(' · ')}</td><td class="right"><button class="btn btn-sm" data-act="edit" data-id="${p.id}">Edit</button> ${isAdmin()?`<button class="btn btn-sm btn-danger" data-act="del" data-id="${p.id}">Delete</button>`:''}</td></tr>`).join('')}</tbody></table>`
+      }
+    </div>
+  </div>`);
+  body.appendChild(card);
+  card.querySelector('#addPilot').addEventListener('click',()=>openPilotModal(null,body));
+  card.querySelectorAll('button[data-act]').forEach(b=>b.addEventListener('click',()=>openPilotModal(b.dataset.id,body,b.dataset.act)));
+}
+
+function openPilotModal(id,body,delMode){
+  const editing=id?getCustomPilots().find(x=>x.id===id):null;
+  if(delMode==='del' && editing){
+    if(confirm(`Delete pilot "${editing.label}"?`)){
+      apiCall('DELETE',`/api/pilots/${editing.id}`).then(async()=>{
+        await reloadData(); toast('Pilot deleted','success'); renderAdminTab('pilots',body);
+      }).catch(e=>toast(e.message,'error'));
+    }
+    return;
+  }
+  const fields=editing?(editing.fields||defaultPilotFields()):defaultPilotFields();
+  const m=openModal(editing?'Edit Pilot Programme':'Add Pilot Programme',`
+    <div class="field">
+      <label>Pilot Name *</label>
+      <input id="p-label" placeholder="e.g. Hypertension Screening" value="${escapeHtml(editing?.label||'')}">
+      <span class="field-help">This name appears in data entry sections, KPI tiles, charts, and reports.</span>
+    </div>
+    <div class="section-title">Fields (same as cancer screening flow)</div>
+    <div class="field-help" style="margin-bottom:10px">You can rename labels if needed. The 4-field structure (Screened / Positive / Referred / Treatment Initiated) keeps the same dashboard layout.</div>
+    ${fields.map((f,i)=>`<div class="field"><label>Field ${i+1} label</label><input data-pf-l="${i}" value="${escapeHtml(f.l)}"><input type="hidden" data-pf-k="${i}" value="${escapeHtml(f.k)}"><span class="field-help">${i===0?'People screened in this pilot.':i===1?'Number of positive/suspected cases identified.':i===2?'Cases referred to higher facility for confirmation/care.':'Cases where treatment started.'}</span></div>`).join('')}
+  `,[
+    {label:'Cancel',class:'btn'},
+    {label:editing?'Save Changes':'Add Pilot',class:'btn btn-primary',primary:true,onClick:async(close)=>{
+      const label=m.querySelector('#p-label').value.trim();
+      if(!label){ toast('Pilot name is required','error'); return; }
+      const newFields=fields.map((f,i)=>({k:m.querySelector(`[data-pf-k="${i}"]`).value,l:m.querySelector(`[data-pf-l="${i}"]`).value.trim()||f.l}));
+      const payload={id:editing?.id||`pilot_${uid()}`,label,custom:true,pilot:true,fields:newFields};
+      try{
+        if(editing) await apiCall('PUT',`/api/pilots/${editing.id}`,payload);
+        else await apiCall('POST','/api/pilots',payload);
+        await reloadData();
+        toast(editing?'Pilot updated':'Pilot added','success');
+        close();
+        renderAdminTab('pilots',body);
+      }catch(e){ toast(e.message,'error'); }
+    }}
+  ]);
+}
+
+/* ---------- Admin: PHCs ---------- */
+function renderAdminPHCs(body){
+  const card=el(`<div class="card">
+    <div class="card-head">
+      <h3>Upgraded PHCs (${DATA.phcs.length})</h3>
+      <button class="btn btn-primary btn-sm" id="addPhc">+ Add PHC</button>
+    </div>
+    <div class="card-body">
+      ${DATA.phcs.length===0
+        ?`<div class="empty"><div class="em-icon">🏥</div><h4>No PHCs yet</h4><p>Click <strong>+ Add PHC</strong> to add the first upgraded PHC.</p></div>`
+        :`<table class="table">
+            <thead><tr><th>Name</th><th>Mandal</th><th>Upgraded On</th><th>Months of Data</th><th class="right">Actions</th></tr></thead>
+            <tbody>${[...DATA.phcs].sort((a,b)=>new Date(a.upgradedOn||0)-new Date(b.upgradedOn||0)).map(p=>`<tr>
+              <td><strong>${escapeHtml(p.name)}</strong></td>
+              <td>${escapeHtml(p.mandal||'—')}</td>
+              <td>${p.upgradedOn?new Date(p.upgradedOn).toLocaleDateString():'—'}</td>
+              <td>${Object.keys(p.monthlyData||{}).length}</td>
+              <td class="right">
+                <button class="btn btn-sm" data-act="edit" data-id="${p.id}">Edit</button>
+                ${isAdmin()?`<button class="btn btn-sm btn-danger" data-act="del" data-id="${p.id}">Delete</button>`:''}
+              </td>
+            </tr>`).join('')}</tbody>
+          </table>`
+      }
+    </div>
+  </div>`);
+  body.appendChild(card);
+  card.querySelector('#addPhc').addEventListener('click',()=>openPhcModal(null,body));
+  card.querySelectorAll('button[data-act]').forEach(b=>{
+    b.addEventListener('click',async ()=>{
+      if(b.dataset.act==='edit') openPhcModal(b.dataset.id,body);
+      if(b.dataset.act==='del'){
+        const p=getPHC(b.dataset.id);
+        if(confirm(`Delete PHC "${p.name}"? This will remove all monthly data and impact content.`)){
+          try{
+            await apiCall('DELETE',`/api/phcs/${p.id}`);
+            DATA.phcs=DATA.phcs.filter(x=>x.id!==b.dataset.id);
+            toast('PHC deleted','success');
+            renderAdminTab('phcs',body);
+          }catch(e){ toast(e.message,'error'); }
+        }
+      }
+    });
+  });
+}
+
+function openPhcModal(id,body){
+  const editing=id?getPHC(id):null;
+  const m=openModal(editing?'Edit PHC':'Add PHC',`
+    <div class="form-row">
+      <div class="field"><label>PHC Name *</label><input id="f-name" value="${escapeHtml(editing?.name||'')}" required></div>
+      <div class="field"><label>Mandal / Block</label><input id="f-mandal" value="${escapeHtml(editing?.mandal||'')}"></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>Google Map</label><input id="f-loc" type="url" placeholder="Paste Google Maps share URL (e.g. https://maps.app.goo.gl/...)" value="${escapeHtml(editing?.location||'')}"><span class="field-help">Open Google Maps &rarr; Share &rarr; Copy link, then paste here</span></div>
+      <div class="field"><label>Upgraded On</label><input id="f-up" type="date" value="${editing?.upgradedOn||''}"></div>
+    </div>
+    <div class="field"><label>Notes</label><textarea id="f-notes" rows="3">${escapeHtml(editing?.notes||'')}</textarea></div>
+  `,[
+    {label:'Cancel',class:'btn'},
+    {label:editing?'Save Changes':'Add PHC',class:'btn btn-primary',primary:true,onClick:async(close)=>{
+      const name=m.querySelector('#f-name').value.trim();
+      if(!name){ toast('Name is required','error'); return; }
+      const obj={
+        id:editing?editing.id:uid(),
+        name,
+        mandal:m.querySelector('#f-mandal').value.trim(),
+        location:m.querySelector('#f-loc').value.trim(),
+        upgradedOn:m.querySelector('#f-up').value,
+        notes:m.querySelector('#f-notes').value.trim(),
+      };
+      try{
+        if(editing){
+          const updated=await apiCall('PUT',`/api/phcs/${obj.id}`,obj);
+          const idx=DATA.phcs.findIndex(p=>p.id===obj.id);
+          if(idx>=0) DATA.phcs[idx]=updated;
+        }else{
+          const created=await apiCall('POST','/api/phcs',obj);
+          DATA.phcs.push(created);
+        }
+        toast(editing?'PHC updated':'PHC added','success');
+        close();
+        if(body) renderAdminTab('phcs',body);
+      }catch(e){ toast(e.message,'error'); }
+    }}
+  ]);
+}
+
+/* ---------- Admin: Monthly Data ---------- */
+function renderAdminMonthly(body){
+  if(DATA.phcs.length===0){
+    body.appendChild(el(`<div class="empty"><div class="em-icon">📊</div><h4>Add a PHC first</h4><p>You need at least one PHC before you can enter monthly data.</p></div>`));
+    return;
+  }
+  const months=allMonthKeysSince();
+  const years=yearsSince();
+  const curYear=new Date().getFullYear();
+  const card=el(`<div class="card">
+    <div class="card-head"><h3>Monthly Data Entry</h3><span class="muted" style="font-size:12px">Data range: ${monthLabel(months[0])} - ${monthLabel(months[months.length-1])}</span></div>
+    <div class="card-body">
+      <div class="form-row" style="margin-bottom:18px">
+        <div class="field"><label>PHC</label>
+          <select id="entryPhc">${DATA.phcs.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')}</select>
+        </div>
+        <div class="field"><label>Year</label>
+          <select id="entryYear">${years.slice().reverse().map(y=>`<option value="${y}" ${y===curYear?'selected':''}>${y}</option>`).join('')}</select>
+        </div>
+        <div class="field"><label>Month</label>
+          <select id="entryMonth"></select>
+        </div>
+      </div>
+      <div id="entryFormHost"></div>
+      <div class="row-flex" style="margin-top:18px;justify-content:flex-end">
+        <button class="btn" id="entryReset">Clear Month</button>
+        <button class="btn btn-primary" id="entrySave">Save Data</button>
+      </div>
+    </div>
+  </div>`);
+  body.appendChild(card);
+  const host=card.querySelector('#entryFormHost');
+  const phcSel=card.querySelector('#entryPhc');
+  const yrSel=card.querySelector('#entryYear');
+  const monSel=card.querySelector('#entryMonth');
+
+  function populateMonths(preferredKey){
+    const y=Number(yrSel.value);
+    const ms=monthsInYear(y);
+    monSel.innerHTML=ms.slice().reverse().map(m=>`<option value="${m}">${monthLabel(m)}</option>`).join('');
+    if(preferredKey && ms.includes(preferredKey)) monSel.value=preferredKey;
+    else if(y===new Date().getFullYear() && ms.includes(thisMonthKey())) monSel.value=thisMonthKey();
+    else monSel.value=ms[ms.length-1];
+  }
+
+  function renderForm(){
+    const phc=getPHC(phcSel.value);
+    const month=monSel.value;
+    const rec=getMonthlyRecord(phc,month);
+    host.innerHTML='';
+    getAllIndicators().forEach(ind=>{
+      const sec=el(`<div><div class="section-title">${escapeHtml(ind.label)}</div></div>`);
+      if(ind.pilot){
+        const checked=!!(rec[ind.id] && rec[ind.id].notApplicable);
+        const naRow=el(`<div class="na-row">
+          <label class="na-label${checked?' na-active':''}">
+            <input type="checkbox" data-na-ind="${ind.id}" ${checked?'checked':''}>
+            <span><strong>Not Applicable</strong> for this PHC (pilot programme — applies only to participating PHCs)</span>
+          </label>
+        </div>`);
+        sec.appendChild(naRow);
+      }
+      const row=el(`<div class="form-row"></div>`);
+      ind.fields.forEach(f=>{
+        const cur=rec[ind.id]?.[f.k]??'';
+        if(f.type==='yesno'){
+          row.appendChild(el(`<div class="field"><label>${escapeHtml(f.l)}</label>
+            <select data-ind="${ind.id}" data-k="${f.k}">
+              <option value="">—</option>
+              <option value="Yes"${cur==='Yes'?' selected':''}>Yes</option>
+              <option value="No"${cur==='No'?' selected':''}>No</option>
+            </select></div>`));
+        }else{
+          row.appendChild(el(`<div class="field"><label>${escapeHtml(f.l)}</label>
+            <input type="number" min="0" step="1" data-ind="${ind.id}" data-k="${f.k}" value="${escapeHtml(cur===0?'0':String(cur||''))}"></div>`));
+        }
+      });
+      sec.appendChild(row);
+      host.appendChild(sec);
+    });
+    host.querySelectorAll('[data-na-ind]').forEach(chk=>{
+      const ind=chk.dataset.naInd;
+      const lbl=chk.closest('.na-label');
+      const sync=()=>{
+        lbl?.classList.toggle('na-active',chk.checked);
+        host.querySelectorAll(`[data-ind="${ind}"]`).forEach(inp=>{
+          inp.disabled=chk.checked;
+          inp.closest('.field')?.classList.toggle('na-field',chk.checked);
+          if(chk.checked && inp.tagName!=='SELECT') inp.value='0';
+        });
+      };
+      chk.addEventListener('change',sync);
+      sync();
+    });
+  }
+  phcSel.addEventListener('change',renderForm);
+  yrSel.addEventListener('change',()=>{ const prev=monSel.value; populateMonths(prev); renderForm(); });
+  monSel.addEventListener('change',renderForm);
+  populateMonths(thisMonthKey());
+  renderForm();
+
+  card.querySelector('#entrySave').addEventListener('click',async()=>{
+    const phc=getPHC(phcSel.value);
+    const month=monSel.value;
+    const rec=getMonthlyRecord(phc,month);
+    host.querySelectorAll('[data-ind]').forEach(inp=>{
+      const ind=inp.dataset.ind,k=inp.dataset.k,v=inp.value;
+      if(inp.tagName==='SELECT') rec[ind][k]=v;
+      else rec[ind][k]=(v===''?0:Number(v));
+    });
+    host.querySelectorAll('[data-na-ind]').forEach(chk=>{
+      const ind=chk.dataset.naInd;
+      rec[ind].notApplicable=chk.checked;
+      if(chk.checked){
+        const def=getAllIndicators().find(x=>x.id===ind);
+        if(def) def.fields.forEach(f=>{ if(f.type!=='yesno') rec[ind][f.k]=0; });
+      }
+    });
+    try{
+      await apiCall('PUT',`/api/phcs/${phc.id}/monthly/${month}`,rec);
+      toast(`Saved ${phc.name} — ${monthLabel(month)}`,'success');
+    }catch(e){ toast(e.message,'error'); }
+  });
+
+  card.querySelector('#entryReset').addEventListener('click',async()=>{
+    if(!confirm('Clear all values for this PHC and month?')) return;
+    const phc=getPHC(phcSel.value);
+    const month=monSel.value;
+    try{
+      await apiCall('DELETE',`/api/phcs/${phc.id}/monthly/${month}`);
+      phc.monthlyData[month]=emptyMonthRecord();
+      renderForm();
+      toast('Month cleared');
+    }catch(e){ toast(e.message,'error'); }
+  });
+}
+
+/* ---------- Admin: Impact ---------- */
+function renderAdminImpact(body){
+  if(DATA.phcs.length===0){
+    body.appendChild(el(`<div class="empty"><div class="em-icon">💬</div><h4>Add a PHC first</h4><p>You need at least one PHC before you can manage impact content.</p></div>`));
+    return;
+  }
+  const card=el(`<div class="card">
+    <div class="card-head"><h3>Impact Content</h3></div>
+    <div class="card-body">
+      <div class="form-row" style="margin-bottom:18px">
+        <div class="field"><label>PHC</label>
+          <select id="impPhc">${DATA.phcs.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')}</select>
+        </div>
+      </div>
+      <div id="impHost"></div>
+    </div>
+  </div>`);
+  body.appendChild(card);
+  const host=card.querySelector('#impHost');
+  const sel=card.querySelector('#impPhc');
+
+  function ensureImpact(p){
+    if(!p.impact) p.impact={};
+    p.impact.caseStories=p.impact.caseStories||[];
+    p.impact.videos=p.impact.videos||[];
+    p.impact.dignitaryVisits=p.impact.dignitaryVisits||[];
+    p.impact.pictures=p.impact.pictures||[];
+    if(p.impact.overallImpact===undefined) p.impact.overallImpact='';
+  }
+
+  function renderImpact(){
+    const phc=getPHC(sel.value);
+    ensureImpact(phc);
+    // Clear picture cache for this PHC so admin sees fresh data
+    delete _picCache[phc.id];
+    host.innerHTML='';
+    host.appendChild(buildSubBlock('Case Stories','caseStories',[{k:'title',l:'Title'},{k:'date',l:'Date',type:'date'},{k:'content',l:'Story',type:'textarea'},{k:'images',l:'Images',type:'images'}],phc,renderImpact));
+    host.appendChild(buildSubBlock('Videos','videos',[{k:'title',l:'Title'},{k:'url',l:'Video URL or upload',type:'video'},{k:'description',l:'Description',type:'textarea'}],phc,renderImpact));
+    host.appendChild(buildSubBlock('Dignitary Visits','dignitaryVisits',[{k:'dignitary',l:'Name & Designation'},{k:'date',l:'Date',type:'date'},{k:'purpose',l:'Purpose / Notes',type:'textarea'},{k:'photos',l:'Photos',type:'images'}],phc,renderImpact));
+    host.appendChild(buildSubBlock('Pictures','pictures',[{k:'caption',l:'Caption'},{k:'dataUrl',l:'Image',type:'image'}],phc,renderImpact));
+    const overall=el(`<div><div class="section-title">Overall Impact Narrative</div>
+      <div class="field"><textarea id="overallTxt" rows="6" placeholder="Describe the overall impact this PHC has had since upgradation…">${escapeHtml(phc.impact.overallImpact||'')}</textarea></div>
+      <div class="row-flex" style="justify-content:flex-end;margin-top:8px"><button class="btn btn-primary" id="saveOverall">Save Overall Impact</button></div></div>`);
+    host.appendChild(overall);
+    overall.querySelector('#saveOverall').addEventListener('click',async()=>{
+      const text=overall.querySelector('#overallTxt').value;
+      try{
+        await apiCall('PUT',`/api/phcs/${phc.id}/impact/overall`,{text});
+        phc.impact.overallImpact=text;
+        toast('Overall impact saved','success');
+      }catch(e){ toast(e.message,'error'); }
+    });
+  }
+  sel.addEventListener('change',renderImpact);
+  renderImpact();
+}
+
+function buildSubBlock(title,key,fields,phc,rerender){
+  const wrap=el(`<div><div class="section-title">${escapeHtml(title)}</div>
+    <div class="row-flex" style="justify-content:space-between;margin-bottom:10px">
+      <span class="muted" style="font-size:12.5px">${(phc.impact[key]||[]).length} item(s)</span>
+      <button class="btn btn-sm btn-primary" data-add>+ Add</button>
+    </div>
+    <div class="phc-grid" data-list></div></div>`);
+  const list=wrap.querySelector('[data-list]');
+  (phc.impact[key]||[]).forEach(item=>{
+    const previewKey=fields.find(f=>f.type==='textarea')?.k||fields[0].k;
+    const preview=item[previewKey]||item.title||item.dignitary||item.caption||'(no preview)';
+    list.appendChild(el(`<div class="phc-card">
+      ${(String(item.videoData||'').startsWith('data:video/'))?`<video controls style="width:100%;height:160px;object-fit:cover;border-radius:8px"><source src="${escapeHtml(item.videoData)}"></video>`:''}
+      ${((Array.isArray(item.photos)&&item.photos[0])||item.photo)?`<img src="${escapeHtml((Array.isArray(item.photos)&&item.photos[0])||item.photo)}" style="width:100%;height:120px;object-fit:cover;border-radius:8px">`:''}
+      ${item.dataUrl?`<img src="${escapeHtml(item.dataUrl)}" style="width:100%;height:120px;object-fit:cover;border-radius:8px">`:''}
+      <h4>${escapeHtml(item.title||item.dignitary||item.caption||'Item')}</h4>
+      <div class="phc-meta">${escapeHtml(String(preview).slice(0,140))}${String(preview).length>140?'…':''}</div>
+      <div class="phc-actions">
+        <button class="btn btn-sm" data-edit="${item.id}">Edit</button>
+        ${isAdmin()?`<button class="btn btn-sm btn-danger" data-del="${item.id}">Delete</button>`:''}
+      </div>
+    </div>`));
+  });
+  wrap.querySelector('[data-add]').addEventListener('click',()=>openItemModal(title,fields,null,phc,key,rerender));
+  list.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>{
+    const item=phc.impact[key].find(x=>x.id===b.dataset.edit);
+    openItemModal(title,fields,item,phc,key,rerender);
+  }));
+  list.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',async()=>{
+    if(!confirm('Delete this item?')) return;
+    try{
+      await apiCall('DELETE',`/api/phcs/${phc.id}/impact/${key}/${b.dataset.del}`);
+      phc.impact[key]=phc.impact[key].filter(x=>x.id!==b.dataset.del);
+      rerender();
+    }catch(e){ toast(e.message,'error'); }
+  }));
+  return wrap;
+}
+
+function openItemModal(title,fields,editing,phc,key,rerender){
+  const html=fields.map(f=>{
+    const cur=editing?(editing[f.k]||''):'';
+    if(f.type==='textarea') return `<div class="field"><label>${escapeHtml(f.l)}</label><textarea data-k="${f.k}" rows="4">${escapeHtml(cur)}</textarea></div>`;
+    if(f.type==='date') return `<div class="field"><label>${escapeHtml(f.l)}</label><input type="date" data-k="${f.k}" value="${escapeHtml(cur)}"></div>`;
+    if(f.type==='image') return `<div class="field"><label>${escapeHtml(f.l)}</label>
+      <input type="file" accept="image/*" data-k="${f.k}-file">
+      <input type="hidden" data-k="${f.k}" value="${escapeHtml(cur)}">
+      ${cur?`<img src="${escapeHtml(cur)}" style="width:120px;height:90px;object-fit:cover;border-radius:8px;margin-top:6px">`:''}
+    </div>`;
+    if(f.type==='images') return `<div class="field"><label>${escapeHtml(f.l)}</label><input type="file" accept="image/*" data-k="${f.k}-files" multiple><span class="field-help">Pick one or many; images are auto-resized.</span></div>`;
+    if(f.type==='video') return `<div class="field"><label>${escapeHtml(f.l)}</label><input data-k="${f.k}" placeholder="https://www.youtube.com/watch?v=... or paste a video URL" value="${escapeHtml(cur)}"><span class="field-help">Or upload a video file (max 25MB). Keep clips short for best browser performance.</span><input type="file" accept="video/*" data-k="${f.k}-file"></div>`;
+    return `<div class="field"><label>${escapeHtml(f.l)}</label><input data-k="${f.k}" value="${escapeHtml(cur)}"></div>`;
+  }).join('');
+
+  const m=openModal(editing?`Edit ${title.replace(/s$/,'')}`:` Add ${title.replace(/s$/,'')}`,html,[
+    {label:'Cancel',class:'btn'},
+    {label:'Save',class:'btn btn-primary',primary:true,onClick:async(close)=>{
+      const item=editing?{...editing}:{id:uid()};
+      for(const f of fields){
+        if(f.type==='image'){
+          const file=m.querySelector(`[data-k="${f.k}-file"]`).files[0];
+          if(file){
+            try{ item[f.k]=await compressImageFileToDataUrl(file); }catch(e){ toast('Image read failed','error'); return; }
+          }else{ item[f.k]=m.querySelector(`[data-k="${f.k}"]`).value; }
+        }else if(f.type==='images'){
+          const files=[...(m.querySelector(`[data-k="${f.k}-files"]`)?.files||[])];
+          if(files.length){
+            const arr=[];
+            for(const file of files){ try{ arr.push(await compressImageFileToDataUrl(file)); }catch(e){ toast('Image read failed','error'); return; } }
+            item[f.k]=arr;
+          }else if(!Array.isArray(item[f.k])) item[f.k]=[];
+        }else if(f.type==='video'){
+          const file=m.querySelector(`[data-k="${f.k}-file"]`)?.files?.[0];
+          item[f.k]=m.querySelector(`[data-k="${f.k}"]`).value.trim();
+          if(file){
+            if(file.size > 25*1024*1024){ toast('Video must be 25MB or less','error'); return; }
+            try{ item.videoData=await fileToDataUrl(file); }catch(e){ toast('Video read failed','error'); return; }
+          }else if(!item.videoData){
+            item.videoData='';
+          }
+        }else{ item[f.k]=m.querySelector(`[data-k="${f.k}"]`).value; }
+      }
+      try{
+        if(editing){
+          await apiCall('PUT',`/api/phcs/${phc.id}/impact/${key}/${item.id}`,item);
+          const idx=phc.impact[key].findIndex(x=>x.id===item.id);
+          if(idx>=0) phc.impact[key][idx]=item;
+        }else{
+          await apiCall('POST',`/api/phcs/${phc.id}/impact/${key}`,item);
+          phc.impact[key]=phc.impact[key]||[];
+          phc.impact[key].push(item);
+        }
+        // Clear pic cache so public view refreshes
+        delete _picCache[phc.id];
+        toast('Saved','success');
+        close();
+        rerender();
+      }catch(e){ toast(e.message,'error'); }
+    }}
+  ]);
+}
+
+function fileToDataUrl(file){
+  return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
+}
+function compressImageFileToDataUrl(file,maxDim=1600,quality=0.85){
+  return new Promise((res,rej)=>{
+    const reader=new FileReader();
+    reader.onerror=()=>rej(new Error('read failed'));
+    reader.onload=()=>{
+      const img=new Image();
+      img.onerror=()=>rej(new Error('decode failed'));
+      img.onload=()=>{
+        let width=img.width,height=img.height;
+        const mx=Math.max(width,height);
+        if(mx>maxDim){ const k=maxDim/mx; width=Math.round(width*k); height=Math.round(height*k); }
+        const c=document.createElement('canvas');
+        c.width=width; c.height=height;
+        const ctx=c.getContext('2d');
+        ctx.imageSmoothingQuality='high';
+        ctx.drawImage(img,0,0,width,height);
+        res(c.toDataURL('image/jpeg',quality));
+      };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ---------- Admin: Users ---------- */
+async function renderAdminUsers(body){
+  body.innerHTML='<div style="text-align:center;padding:40px;color:var(--ink-500)">Loading users…</div>';
+  let users;
+  try{ users=await apiCall('GET','/api/admin/users'); }
+  catch(e){ body.innerHTML=`<div class="empty"><h4>Failed to load users</h4><p>${escapeHtml(e.message)}</p></div>`; return; }
+  body.innerHTML='';
+  const card=el(`<div class="card">
+    <div class="card-head">
+      <div>
+        <h3>Users (${users.length})</h3>
+        <span class="muted" style="font-size:12.5px">Users can add and edit all data but cannot delete records.</span>
+      </div>
+      <button class="btn btn-primary btn-sm" id="addUserBtn">+ Add User</button>
+    </div>
+    <div class="card-body">
+      ${users.length===0
+        ?`<div class="empty"><div class="em-icon">👤</div><h4>No users yet</h4><p>Add a user so others can enter data without full admin access.</p></div>`
+        :`<table class="table">
+            <thead><tr><th>Username</th><th>Role</th><th>Created</th><th class="right">Actions</th></tr></thead>
+            <tbody>${users.map(u=>`<tr>
+              <td><strong>${escapeHtml(u.username)}</strong></td>
+              <td><span class="pill ${u.role==='admin'?'pill-blue':'pill-good'}">${escapeHtml(u.role)}</span></td>
+              <td class="muted" style="font-size:12px">${escapeHtml(u.created_at||'—')}</td>
+              <td class="right">${u.username===_ADMIN_SESSION?.username?'<span class="muted">You</span>':`<button class="btn btn-sm btn-danger" data-del="${u.id}">Delete</button>`}</td>
+            </tr>`).join('')}</tbody>
+          </table>`
+      }
+    </div>
+  </div>`);
+  body.appendChild(card);
+  card.querySelector('#addUserBtn').addEventListener('click',()=>openAddUserModal(()=>renderAdminUsers(body)));
+  card.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',async()=>{
+    if(!confirm('Delete this user?')) return;
+    try{
+      await apiCall('DELETE',`/api/admin/users/${b.dataset.del}`);
+      toast('User deleted','success');
+      renderAdminUsers(body);
+    }catch(e){ toast(e.message,'error'); }
+  }));
+}
+
+function openAddUserModal(onSuccess){
+  const m=openModal('Add User',`
+    <div class="field"><label>Username *</label><input id="nu-user" placeholder="username" spellcheck="false" autocapitalize="off" autocomplete="off"></div>
+    <div class="field"><label>Password *</label><input id="nu-pass" type="password" autocomplete="new-password"></div>
+  `,[
+    {label:'Cancel',class:'btn'},
+    {label:'Create User',class:'btn btn-primary',primary:true,onClick:async(close)=>{
+      const username=m.querySelector('#nu-user').value.trim();
+      const password=m.querySelector('#nu-pass').value;
+      if(!username||!password){ toast('Username and password required','error'); return; }
+      try{
+        await apiCall('POST','/api/admin/users',{username,password,role:'user'});
+        toast('User created','success');
+        close();
+        onSuccess();
+      }catch(e){ toast(e.message,'error'); }
+    }}
+  ]);
+}
+
+/* ---------- Admin: Settings ---------- */
+function renderAdminSettings(body){
+  body.appendChild(el(`<div class="card">
+    <div class="card-head"><h3>Change Admin Credentials</h3></div>
+    <div class="card-body">
+      <div class="form-row">
+        <div class="field"><label>Username</label><input id="su" value="${escapeHtml(_ADMIN_SESSION?.username||'admin')}"></div>
+        <div class="field"><label>Current Password</label><input id="sp" type="password"></div>
+        <div class="field"><label>New Password</label><input id="snp" type="password"></div>
+      </div>
+      <div class="row-flex" style="justify-content:flex-end"><button class="btn btn-primary" id="saveCreds">Update Credentials</button></div>
+    </div>
+  </div>`));
+
+  const card2=body.appendChild(el(`<div class="card" style="margin-top:18px">
+    <div class="card-head"><h3>Data Backup</h3></div>
+    <div class="card-body row-flex">
+      <button class="btn" id="dlData">Download all data (.json)</button>
+      <button class="btn" id="upData">Restore from backup</button>
+      <input type="file" id="upFile" accept="application/json" class="hidden">
+      <button class="btn btn-danger" id="resetAll">Reset Everything</button>
+    </div>
+  </div>`));
+
+  body.querySelector('#saveCreds').addEventListener('click',async()=>{
+    const u=body.querySelector('#su').value.trim();
+    const cp=body.querySelector('#sp').value;
+    const np=body.querySelector('#snp').value;
+    if(!u){ toast('Username required','error'); return; }
+    try{
+      const result=await apiCall('PUT','/api/settings/credentials',{currentUsername:_ADMIN_SESSION?.username||'admin',username:u,currentPassword:cp,newPassword:np||undefined});
+      if(_ADMIN_SESSION) _ADMIN_SESSION.username=result.username;
+      toast('Credentials updated','success');
+      body.querySelector('#sp').value=''; body.querySelector('#snp').value='';
+    }catch(e){ toast(e.message||'Update failed','error'); }
+  });
+
+  card2.querySelector('#dlData').addEventListener('click',exportAllData);
+  card2.querySelector('#upData').addEventListener('click',()=>card2.querySelector('#upFile').click());
+  card2.querySelector('#upFile').addEventListener('change',importAllData);
+  card2.querySelector('#resetAll').addEventListener('click',async()=>{
+    if(!confirm('This will delete ALL PHCs, monthly data, and impact content. Continue?')) return;
+    if(!confirm('Are you absolutely sure? This cannot be undone.')) return;
+    try{
+      await apiCall('POST','/api/reset');
+      DATA.phcs=[];
+      toast('All data reset','success');
+      setSession(null);
+      refreshNav();
+      go('home');
+    }catch(e){ toast(e.message,'error'); }
+  });
+}
+
+/* =========================================================================
+   MODAL
+   ========================================================================= */
+function openModal(title,bodyHtml,buttons){
+  const root=document.getElementById('modalRoot');
+  const back=el(`<div class="modal-backdrop"><div class="modal">
+    <div class="modal-head"><h3>${escapeHtml(title)}</h3><button class="modal-close" aria-label="Close">&times;</button></div>
+    <div class="modal-body">${bodyHtml}</div>
+    <div class="modal-foot"></div>
+  </div></div>`);
+  const foot=back.querySelector('.modal-foot');
+  const close=()=>back.remove();
+  back.querySelector('.modal-close').addEventListener('click',close);
+  back.addEventListener('click',e=>{ if(e.target===back) close(); });
+  buttons.forEach(b=>{
+    const btn=el(`<button class="${b.class||'btn'}">${escapeHtml(b.label)}</button>`);
+    btn.addEventListener('click',()=>{ if(b.onClick) b.onClick(close); else close(); });
+    foot.appendChild(btn);
+  });
+  root.appendChild(back);
+  return back;
+}
+
+/* =========================================================================
+   REPORTS: PDF / CSV
+   ========================================================================= */
+function downloadDashboardCSV(phcs,phc,months){
+  const rows=[]; const head=['PHC','Month'];
+  getAllIndicators().forEach(ind=>ind.fields.forEach(f=>head.push(`${ind.label} — ${f.l}`)));
+  rows.push(head);
+  phcs.forEach(p=>{
+    months.forEach(m=>{
+      const rec=(p.monthlyData||{})[m]; if(!rec) return;
+      const r=[p.name,monthLabel(m)];
+      getAllIndicators().forEach(ind=>ind.fields.forEach(f=>r.push(rec[ind.id]?.[f.k]??'')));
+      rows.push(r);
+    });
+  });
+  const csv=rows.map(r=>r.map(v=>{ const s=String(v??''); return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s; }).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`phc-dashboard-${phc?phc.name.replace(/\W+/g,'_'):'cumulative'}.csv`; a.click(); URL.revokeObjectURL(url);
+  toast('CSV downloaded','success');
+}
+
+function downloadDashboardPDF(phcs,phc,month,months){
+  if(phcs.length===0){ toast('No data to export','error'); return; }
+  const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:'pt',format:'a4'}); const pageW=doc.internal.pageSize.getWidth();
+  doc.setFillColor(23,63,140); doc.rect(0,0,pageW,70,'F'); doc.setTextColor(255,255,255);
+  doc.setFontSize(16); doc.setFont('helvetica','bold'); doc.text('PHC Upgradation Srikakulam',36,30);
+  doc.setFontSize(11); doc.setFont('helvetica','normal'); doc.text(phc?`${phc.name} — Dashboard Report`:'Cumulative Dashboard — All PHCs',36,48);
+  doc.setFontSize(9); doc.text(`Generated ${new Date().toLocaleString()}`,pageW-36,30,{align:'right'}); doc.text(`Reporting Month: ${monthLabel(month)}`,pageW-36,48,{align:'right'});
+  doc.setTextColor(11,26,51);
+  const summaryRows=[];
+  summaryRows.push(['OPD Registrations',fmt(sumIndicator(phcs,'opd',month,'value'))]);
+  summaryRows.push(['IPD Admissions',fmt(sumIndicator(phcs,'ipd',month,'value'))]);
+  summaryRows.push(['Institutional Deliveries',fmt(sumIndicator(phcs,'deliveries',month,'value'))]);
+  summaryRows.push(['Lab Tests',fmt(sumIndicator(phcs,'labTests',month,'value'))]);
+  ['oral','breast','cervical'].forEach(k=>{ const lbl=k==='oral'?'Oral':k==='breast'?'Breast':'Cervical'; summaryRows.push([`${lbl} Cancer Screening — Screened`,fmt(sumIndicator(activePhcsForIndicator(phcs,k,month),k,month,'screened'))]); summaryRows.push([`${lbl} Cancer Screening — Positive`,fmt(sumIndicator(activePhcsForIndicator(phcs,k,month),k,month,'positive'))]); summaryRows.push([`${lbl} Cancer Screening — Referred`,fmt(sumIndicator(activePhcsForIndicator(phcs,k,month),k,month,'referred'))]); summaryRows.push([`${lbl} Cancer Screening — Treatment Initiated`,fmt(sumIndicator(activePhcsForIndicator(phcs,k,month),k,month,'treatmentInitiated'))]); });
+  summaryRows.push(['Staff Training Coverage (No. trained)',fmt(sumIndicator(phcs,'training',month,'count'))]);
+  let indYes=0,indTot=0; phcs.forEach(p=>{ const r=(p.monthlyData||{})[month]; if(r&&r.drugIndent&&r.drugIndent.status){ indTot++; if(String(r.drugIndent.status).toLowerCase()==='yes') indYes++; } }); summaryRows.push(['Essential Drug Indent Submission (Yes / Reported)',indTot?`${indYes}/${indTot}`:'–']);
+  ['mo','sn','lt','po'].forEach(role=>{ const lbl={mo:'Medical Officer',sn:'Staff Nurse',lt:'Lab Technician',po:'Pharmacy Officer'}[role]; summaryRows.push([`${lbl} — Sanctioned`,fmt(sumIndicator(phcs,'hr',month,role+'Sanc'))]); summaryRows.push([`${lbl} — Filled`,fmt(sumIndicator(phcs,'hr',month,role+'Filled'))]); });
+  ['computers','deliveryBed','lamp','paraMonitor','coag','doppler'].forEach(k=>{ const lbl={computers:'Computers',deliveryBed:'Delivery Bed',lamp:'Ceiling Lamp',paraMonitor:'Para Monitor',coag:'Coagulation Analyser',doppler:'Foetal Doppler'}[k]; summaryRows.push([`Equipment Downtime — ${lbl} (days)`,fmt(sumIndicator(phcs,'equipment',month,k))]); });
+  let bmwYes=0,bmwTot=0; phcs.forEach(p=>{ const r=(p.monthlyData||{})[month]; if(r&&r.bmw&&r.bmw.status){ bmwTot++; if(String(r.bmw.status).toLowerCase()==='yes') bmwYes++; } }); summaryRows.push(['BMW Compliance (Yes / Reported)',bmwTot?`${bmwYes}/${bmwTot}`:'–']);
+  doc.autoTable({startY:90,head:[['Indicator','Value']],body:summaryRows,theme:'striped',headStyles:{fillColor:[47,107,220],textColor:255,fontStyle:'bold'},styles:{fontSize:9,cellPadding:5},columnStyles:{1:{halign:'right',cellWidth:90}}});
+  let y=doc.lastAutoTable.finalY+18; if(y>700){doc.addPage();y=50;}
+  doc.setFontSize(12);doc.setFont('helvetica','bold');doc.text('Monthly Breakdown — Key Indicators (Last 12 months)',36,y);y+=8;
+  const monthlyHead=['PHC','Month','OPD','IPD','Deliveries','Lab','Trained','Indent','BMW'];
+  const monthlyBody=[];
+  phcs.forEach(p=>{ months.forEach(m=>{ const rec=(p.monthlyData||{})[m]; if(!rec) return; monthlyBody.push([p.name,monthLabel(m),rec.opd?.value??'',rec.ipd?.value??'',rec.deliveries?.value??'',rec.labTests?.value??'',rec.training?.count??'',rec.drugIndent?.status??'',rec.bmw?.status??'']); }); });
+  doc.autoTable({startY:y+8,head:[monthlyHead],body:monthlyBody.length?monthlyBody:[['—','—','—','—','—','—','—','—','—']],theme:'grid',headStyles:{fillColor:[23,63,140],textColor:255,fontSize:9},styles:{fontSize:8,cellPadding:4}});
+  const pages=doc.internal.getNumberOfPages(); for(let i=1;i<=pages;i++){ doc.setPage(i); doc.setFontSize(8);doc.setTextColor(120); doc.text(`Page ${i} of ${pages}`,pageW-36,doc.internal.pageSize.getHeight()-20,{align:'right'}); doc.text('PHC Upgradation Srikakulam Dashboard',36,doc.internal.pageSize.getHeight()-20); }
+  doc.save(`phc-dashboard-${phc?phc.name.replace(/\W+/g,'_'):'cumulative'}-${month}.pdf`);
+  toast('PDF downloaded','success');
+}
+
+function downloadImpactPDF(phcs,phc){
+  const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:'pt',format:'a4'}); const pageW=doc.internal.pageSize.getWidth();
+  doc.setFillColor(23,63,140);doc.rect(0,0,pageW,70,'F');doc.setTextColor(255,255,255);
+  doc.setFontSize(16);doc.setFont('helvetica','bold');doc.text('PHC Upgradation Srikakulam',36,30);
+  doc.setFontSize(11);doc.setFont('helvetica','normal');doc.text(phc?`${phc.name} — Impact Report`:'Cumulative Impact Report — All PHCs',36,48);
+  doc.setFontSize(9);doc.text(`Generated ${new Date().toLocaleString()}`,pageW-36,30,{align:'right'});
+  doc.setTextColor(11,26,51);
+  let y=90;
+  function ensureSpace(h){ if(y+h>770){doc.addPage();y=50;} }
+  function sectionTitle(t){ ensureSpace(28);doc.setFillColor(238,245,255);doc.rect(36,y,pageW-72,24,'F');doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(23,63,140);doc.text(t,44,y+16);y+=32;doc.setTextColor(11,26,51);doc.setFont('helvetica','normal'); }
+  function para(text){ if(!text) return; doc.setFontSize(10); const lines=doc.splitTextToSize(text,pageW-72); lines.forEach(l=>{ensureSpace(14);doc.text(l,36,y);y+=14;}); y+=4; }
+  phcs.forEach((p,idx)=>{
+    if(idx>0){doc.addPage();y=50;}
+    doc.setFontSize(15);doc.setFont('helvetica','bold');ensureSpace(22);doc.text(p.name,36,y);y+=22;
+    if(p.mandal||p.location){doc.setFontSize(10);doc.setFont('helvetica','italic');doc.setTextColor(90);doc.text(`${p.mandal||''}${p.mandal&&p.location?' · ':''}${p.location||''}`,36,y);y+=16;doc.setTextColor(11,26,51);doc.setFont('helvetica','normal');}
+    const imp=p.impact||{};
+    if((imp.caseStories||[]).length){sectionTitle('Case Stories');imp.caseStories.forEach(c=>{doc.setFont('helvetica','bold');doc.setFontSize(11);ensureSpace(16);doc.text(c.title||'Untitled',36,y);y+=14;if(c.date){doc.setFont('helvetica','italic');doc.setFontSize(9);doc.setTextColor(90);ensureSpace(12);doc.text(c.date,36,y);y+=12;doc.setTextColor(11,26,51);}doc.setFont('helvetica','normal');para(c.content||'');});}
+    if((imp.dignitaryVisits||[]).length){sectionTitle('Dignitary Visits');imp.dignitaryVisits.forEach(d=>{doc.setFont('helvetica','bold');doc.setFontSize(11);ensureSpace(16);doc.text(d.dignitary||'Unnamed',36,y);y+=14;if(d.date){doc.setFont('helvetica','italic');doc.setFontSize(9);doc.setTextColor(90);ensureSpace(12);doc.text(d.date,36,y);y+=12;doc.setTextColor(11,26,51);}doc.setFont('helvetica','normal');para(d.purpose||'');});}
+    if((imp.videos||[]).length){sectionTitle('Videos');imp.videos.forEach(v=>{doc.setFont('helvetica','bold');doc.setFontSize(11);ensureSpace(14);doc.text(v.title||'Untitled',36,y);y+=14;doc.setFont('helvetica','normal');doc.setFontSize(10);if(v.url){ensureSpace(12);doc.setTextColor(47,107,220);doc.text(v.url,36,y);doc.setTextColor(11,26,51);y+=14;}para(v.description||'');});}
+    if((imp.pictures||[]).length){sectionTitle('Pictures');doc.setFontSize(10);ensureSpace(14);doc.text(`${imp.pictures.length} picture(s) attached. Captions:`,36,y);y+=14;imp.pictures.forEach(pic=>{if(pic.caption){ensureSpace(12);doc.text(`• ${pic.caption}`,44,y);y+=12;}});y+=4;}
+    if((imp.overallImpact||'').trim()){sectionTitle('Overall Impact');para(imp.overallImpact);}
+    if(!imp.caseStories?.length&&!imp.dignitaryVisits?.length&&!imp.videos?.length&&!imp.pictures?.length&&!(imp.overallImpact||'').trim()){doc.setFontSize(10);doc.setTextColor(120);ensureSpace(14);doc.text('No impact content recorded yet.',36,y);y+=14;doc.setTextColor(11,26,51);}
+  });
+  const pages=doc.internal.getNumberOfPages();for(let i=1;i<=pages;i++){doc.setPage(i);doc.setFontSize(8);doc.setTextColor(120);doc.text(`Page ${i} of ${pages}`,pageW-36,doc.internal.pageSize.getHeight()-20,{align:'right'});doc.text('PHC Upgradation Srikakulam Dashboard',36,doc.internal.pageSize.getHeight()-20);}
+  doc.save(`phc-impact-${phc?phc.name.replace(/\W+/g,'_'):'cumulative'}.pdf`);
+  toast('Impact PDF downloaded','success');
+}
+
+/* =========================================================================
+   IMPORT / EXPORT
+   ========================================================================= */
+async function exportAllData(){
+  try{
+    const data=await apiCall('GET','/api/export');
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob); const a=document.createElement('a');
+    a.href=url; a.download=`phc-srikakulam-backup-${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);
+    toast('Backup downloaded','success');
+  }catch(e){ toast(e.message,'error'); }
+}
+
+async function importAllData(e){
+  const file=e.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=async()=>{
+    try{
+      const obj=JSON.parse(r.result);
+      if(!obj.phcs||!Array.isArray(obj.phcs)) throw new Error('Invalid backup file');
+      if(!confirm('This will REPLACE all current data. Continue?')) return;
+      await apiCall('POST','/api/import',obj);
+      await reloadData();
+      toast('Data restored','success');
+      navigate();
+    }catch(err){ toast(err.message||'Import failed','error'); }
+  };
+  r.readAsText(file);
+  e.target.value='';
+}
+
+/* =========================================================================
+   NAV / SESSION
+   ========================================================================= */
+function refreshNav(){
+  const loggedIn=!!_ADMIN_SESSION;
+  document.getElementById('navLogin').classList.toggle('hidden',loggedIn);
+  document.getElementById('navAdmin').classList.toggle('hidden',!loggedIn);
+  document.getElementById('navLogout').classList.toggle('hidden',!loggedIn);
+  const navAdminEl=document.getElementById('navAdmin');
+  if(navAdminEl) navAdminEl.textContent=isAdmin()?'Admin':'Panel';
+}
+document.getElementById('navLogout').addEventListener('click',async e=>{
+  e.preventDefault();
+  try{ await apiCall('POST','/api/logout'); }catch(e){}
+  setSession(null); refreshNav(); toast('Logged out','success'); go('home');
+});
+refreshNav();
+
+/* =========================================================================
+   GEOGRAPHICAL MAP
+   ========================================================================= */
+let _leafletLoaded = false;
+let _leafletLoading = false;
+let _geoMap = null;
+let _geoMarkerLayer = null;
+const _geoCoordCache = {};
+
+function openGeoModal() {
+  document.getElementById('geoOverlay').classList.remove('hidden');
+  if (_leafletLoaded) {
+    initGeoMap();
+  } else if (!_leafletLoading) {
+    _leafletLoading = true;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(link);
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.onload = () => { _leafletLoaded = true; initGeoMap(); };
+    document.head.appendChild(script);
+  }
+}
+
+async function loadDistrictBoundary() {
+  try {
+    const url = 'https://nominatim.openstreetmap.org/search?q=Srikakulam+district+Andhra+Pradesh+India&format=geojson&polygon_geojson=1&limit=1';
+    const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!r.ok) return;
+    const data = await r.json();
+    const feature = (data.features || [])[0];
+    if (!feature) return;
+    L.geoJSON(feature, {
+      style: {
+        color: '#1f53b8',
+        weight: 2,
+        fillColor: '#2f6bdc',
+        fillOpacity: 0.07,
+        dashArray: '7 5'
+      }
+    }).addTo(_geoMap);
+  } catch(e) {}
+}
+
+function initGeoMap() {
+  if (!_geoMap) {
+    _geoMap = L.map('geoMapEl').setView([18.2949, 83.8938], 9);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(_geoMap);
+    _geoMarkerLayer = L.layerGroup().addTo(_geoMap);
+    loadDistrictBoundary();
+  }
+  setTimeout(() => _geoMap.invalidateSize(), 120);
+  _geoMarkerLayer.clearLayers();
+  plotGeoMarkers();
+}
+
+function parseGeoLatLng(url) {
+  if (!url) return null;
+  let m = url.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+  if (m) return [parseFloat(m[1]), parseFloat(m[2])];
+  m = url.match(/[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+  if (m) return [parseFloat(m[1]), parseFloat(m[2])];
+  m = url.match(/[?&]ll=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+  if (m) return [parseFloat(m[1]), parseFloat(m[2])];
+  return null;
+}
+
+function addGeoMarker(phc, latlng) {
+  const popup = `<strong>${escapeHtml(phc.name)}</strong><br><span style="color:#6b7280;font-size:12px">${escapeHtml(phc.mandal||'')}</span>${phc.location?`<br><a href="${escapeHtml(phc.location)}" target="_blank" rel="noopener" style="color:#1d4ed8;font-size:12px">View on Google Maps →</a>`:''}`;
+  L.marker(latlng).addTo(_geoMarkerLayer).bindPopup(popup);
+}
+
+function setGeoPreloader(msg) {
+  const el = document.getElementById('geoPreloader');
+  const msgEl = document.getElementById('geoPreloaderMsg');
+  if (!el) return;
+  if (msg) { el.style.display = 'flex'; if (msgEl) msgEl.textContent = msg; }
+  else { el.style.display = 'none'; }
+}
+
+function setGeoFoot(msg, spinning) {
+  const foot = document.getElementById('geoFoot');
+  if (!foot) return;
+  foot.innerHTML = spinning
+    ? `<span class="geo-spinner"></span><span>${msg}</span>`
+    : `<span>${msg}</span>`;
+}
+
+async function geocodeName(name) {
+  const q = encodeURIComponent(name + ', Srikakulam, Andhra Pradesh, India');
+  try {
+    const r = await fetch(`https://photon.komoot.io/api/?q=${q}&limit=1&lang=en`);
+    if (!r.ok) return null;
+    const data = await r.json();
+    const f = (data.features || [])[0];
+    if (!f) return null;
+    const [lng, lat] = f.geometry.coordinates;
+    return [lat, lng];
+  } catch(e) { return null; }
+}
+
+function plotGeoMarkers() {
+  const phcs = DATA.phcs;
+  const bounds = [];
+  let placed = 0;
+  const toGeocode = [];
+
+  phcs.forEach(p => {
+    if (_geoCoordCache[p.id] !== undefined) {
+      if (_geoCoordCache[p.id]) { addGeoMarker(p, _geoCoordCache[p.id]); bounds.push(_geoCoordCache[p.id]); placed++; }
+      return;
+    }
+    const ll = parseGeoLatLng(p.location);
+    if (ll) {
+      _geoCoordCache[p.id] = ll;
+      addGeoMarker(p, ll); bounds.push(ll); placed++;
+    } else {
+      toGeocode.push(p);
+    }
+  });
+
+  function fitMap() {
+    if (bounds.length > 1) _geoMap.fitBounds(L.latLngBounds(bounds), {padding:[40,40]});
+    else if (bounds.length === 1) _geoMap.setView(bounds[0], 13);
+  }
+
+  function done() {
+    setGeoPreloader(null);
+    const missing = phcs.length - placed;
+    setGeoFoot(
+      `Showing ${placed} of ${phcs.length} PHC locations.${missing ? ` (${missing} could not be located)` : ''}`,
+      false
+    );
+    fitMap();
+  }
+
+  if (!toGeocode.length) { done(); return; }
+
+  setGeoPreloader(`Locating PHCs… 0 of ${toGeocode.length}`);
+
+  let idx = 0;
+  async function geocodeNext() {
+    if (idx >= toGeocode.length) { done(); return; }
+    const p = toGeocode[idx++];
+    setGeoPreloader(`Locating ${p.name}… (${idx} of ${toGeocode.length})`);
+    const ll = await geocodeName(p.name);
+    if (ll) {
+      _geoCoordCache[p.id] = ll;
+      addGeoMarker(p, ll); bounds.push(ll); placed++;
+    } else {
+      _geoCoordCache[p.id] = null;
+    }
+    setTimeout(geocodeNext, 300);
+  }
+  geocodeNext();
+}
+
+document.getElementById('geoCloseBtn').addEventListener('click', () => {
+  document.getElementById('geoOverlay').classList.add('hidden');
+});
+document.getElementById('geoOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('geoOverlay')) document.getElementById('geoOverlay').classList.add('hidden');
+});
+
+/* =========================================================================
+   INIT
+   ========================================================================= */
+async function init(){
+  document.getElementById('app').innerHTML='<div style="text-align:center;padding:80px 24px;color:var(--ink-500)"><div style="font-size:28px;margin-bottom:10px">⏳</div>Connecting to database…</div>';
+  await reloadData();
+  navigate();
+}
+
+setInterval(async()=>{
+  if(!PUBLIC_ROUTES.has(_currentRoute)) return;
+  await reloadData();
+  render();
+}, 30*1000);
+
+init();
+</script>
+</body>
+</html>
