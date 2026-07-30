@@ -107,12 +107,22 @@ EOF
   post {
     failure {
       // Roll back to the previously good image if one exists.
+      // This block must never fail on its own, or its exit code replaces
+      // the real error and hides which stage actually broke.
       sh '''
-        PREV=$(( ${APP_TAG} - 1 ))
-        if docker image inspect $IMAGE_NAME:$PREV >/dev/null 2>&1; then
+        set +e
+        PREV=$(( APP_TAG - 1 ))
+        if [ "$PREV" -lt 1 ]; then
+          echo "Build #$APP_TAG is the first build - nothing to roll back to."
+          exit 0
+        fi
+        if docker image inspect "$IMAGE_NAME:$PREV" >/dev/null 2>&1; then
           echo "Rolling back to $IMAGE_NAME:$PREV"
           APP_TAG=$PREV docker compose up -d --force-recreate
+        else
+          echo "No previous image $IMAGE_NAME:$PREV - skipping rollback."
         fi
+        exit 0
       '''
     }
     always {
