@@ -1,0 +1,29 @@
+
+# Never let these reach /var/www/html — Apache serves them as plain text.
+docker-compose.yml
+docker-compose.*.yml
+.env
+.env.*
+*.sql
+*.sql.gz
+*.bak
+
+# Version control and CI
+.git
+.gitignore
+.github
+Jenkinsfile
+Jenkinsfile.*
+k8s/
+scripts/
+
+# Editor / OS noise
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+*.swp
+
+# Docs
+README*
+*.md
